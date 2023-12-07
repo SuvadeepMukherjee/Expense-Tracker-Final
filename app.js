@@ -31,6 +31,6 @@ app.use("/user", userRouter);
 ResetPassword.belongsTo(User);
 User.hasMany(ResetPassword);
 
-sequelize.sync({ force: true }).then((result) => {
+sequelize.sync().then((result) => {
   app.listen(3000);
 });

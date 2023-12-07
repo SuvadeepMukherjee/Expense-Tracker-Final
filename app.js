@@ -25,7 +25,6 @@ const sequelize = require("./util/database");
 const User = require("./models/userModel");
 const ResetPassword = require("./models/resetPasswordModel");
 
-app.use("/", userRouter);
 app.use("/user", userRouter);
 
 ResetPassword.belongsTo(User);

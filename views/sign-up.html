@@ -20,53 +20,60 @@
     <link rel="stylesheet" href="/css/sign-up.css" />
   </head>
   <body>
-    <div class="text-center mt-5">
-      <form style="max-width: 480px; margin: auto">
-        <img
-          src="/assets/expenseIcon.png"
-          alt="logo"
-          height="72"
-          alt="Expense logo"
-          class="mt-4 mb-4"
-        />
-        <h1 class="mt-4 h3 mb-4 font-weight-normal">
-          Please sign up to start tracking your expenses
-        </h1>
-        <label for="emailAddress" class="sr-only mb-4">Name</label>
-        <input
-          type="name"
-          id="namee"
-          class="form-control"
-          placeholder="Name"
-          required
-          autofocus
-        />
-        <label for="email" class="sr-only mb-4">Email Adddress</label>
-        <input
-          type="email"
-          id="email"
-          class="form-control"
-          placeholder="Email Address"
-          required
-          autofocus
-        />
-        <label for="password" class="sr-only">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          class="form-control"
-        />
-        <div class="mt-3">
-          <button id="submit" class="btn btn-large btn-primary btn-block">
-            Sign In
-          </button>
+    <div class="container mt-5">
+      <form class="mx-auto" style="max-width: 480px" id="form">
+        <div class="text-center mb-4">
+          <img
+            src="/assets/expenseIcon.png"
+            alt="Expense logo"
+            height="72"
+            class="mb-4"
+          />
+          <h1 class="h3 mb-4 font-weight-normal">
+            Please sign up to start tracking your expenses
+          </h1>
         </div>
+
+        <div class="form-group">
+          <label for="namee" class="sr-only">Name</label>
+          <input
+            type="name"
+            id="namee"
+            class="form-control"
+            placeholder="Name"
+            required
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="sr-only">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="Email Address"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="sr-only">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="Password"
+          />
+        </div>
+
+        <button id="submit" class="btn btn-primary btn-block mt-3">
+          Sign Up
+        </button>
       </form>
-      <div>
+
+      <div class="text-center mt-3">
         <p id="backend-response"></p>
-      </div>
-      <div>
         <p>Already Have an Account? <a href="/user/login">Log in</a></p>
       </div>
     </div>

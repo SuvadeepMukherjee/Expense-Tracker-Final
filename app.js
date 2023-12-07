@@ -22,9 +22,15 @@ app.use(bodyParser.json());
 const userRouter = require("./router/userRouter");
 const sequelize = require("./util/database");
 
+const User = require("./models/userModel");
+const ResetPassword = require("./models/resetPasswordModel");
+
 app.use("/", userRouter);
 app.use("/user", userRouter);
 
-sequelize.sync().then((result) => {
+ResetPassword.belongsTo(User);
+User.hasMany(ResetPassword);
+
+sequelize.sync({ force: true }).then((result) => {
   app.listen(3000);
 });

@@ -20,8 +20,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const userRouter = require("./router/userRouter");
+const sequelize = require("./util/database");
 
 app.use("/", userRouter);
 app.use("/user", userRouter);
 
-app.listen(3000);
+sequelize.sync().then((result) => {
+  app.listen(3000);
+});

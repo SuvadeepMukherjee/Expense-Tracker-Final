@@ -21,7 +21,7 @@ async function createUser(e) {
       console.log(response);
       if (response.status === 200) {
         console.log("succesfully signed up");
-        //window.location.href = "/user/login";
+        window.location.href = "/user/login";
       }
     })
     .catch((err) => {

@@ -9,6 +9,10 @@ exports.getSignUpPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "sign-up.html"));
 };
 
+exports.getLoginPage = (req, res, next) => {
+  res.sendFile(path.join(rootDir, "views", "login.html"));
+};
+
 exports.postUserSignUp = async (req, res, next) => {
   try {
     const name = req.body.nameValue;

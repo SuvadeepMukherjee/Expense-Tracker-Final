@@ -17,4 +17,9 @@ router.get(
   userAuthentication,
   expenseController.deleteExpense
 );
+router.post(
+  "/editExpense/:id",
+  userAuthentication,
+  expenseController.editExpense
+);
 module.exports = router;

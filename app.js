@@ -20,12 +20,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const userRouter = require("./router/userRouter");
+const resetPasswordRouter = require("./router/resetPasswordRouter");
 const sequelize = require("./util/database");
 
 const User = require("./models/userModel");
 const ResetPassword = require("./models/resetPasswordModel");
 
 app.use("/user", userRouter);
+app.use("/password", resetPasswordRouter);
 
 ResetPassword.belongsTo(User);
 User.hasMany(ResetPassword);

@@ -10,6 +10,10 @@ const rootDir = require("../util/path");
 const User = require("../models/userModel");
 const ResetPassword = require("../models/resetPasswordModel");
 
+const hashPassword = async (password) => {
+  return await bcrypt.hash(password, saltRounds);
+};
+
 exports.forgotPasswordPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "forgotPassword.html"));
 };
@@ -79,28 +83,36 @@ exports.sendMail = async (req, res, next) => {
 exports.updatePassword = async (req, res, next) => {
   try {
     const requestId = req.headers.referer.split("/");
+    console.log("requestId", requestId);
     const password = req.body.password;
+    console.log("password is ", password);
     const checkResetRequest = await ResetPassword.findAll({
       where: { id: requestId[requestId.length - 1], isActive: true },
     });
+    console.log("checkResetRequest", checkResetRequest);
+    console.log("------");
+    console.log("the object", checkResetRequest[0]);
     if (checkResetRequest[0]) {
-      const userId = checkResetRequest[0].dataValues.userId;
-      const result = await ResetPassword.update(
+      const userId = checkResetRequest[0].dataValues;
+      console.log("------");
+      console.log("userId is ", userId);
+      console.log("--------");
+      const result = ResetPassword.update(
         { isActive: false },
         { where: { id: requestId } }
       );
+      console.log("succesfully found in  database");
+
       const newPassword = await hashPassword(password);
+      console.log("hashed password is ", newPassword);
       const user = await User.update(
         { password: newPassword },
-        { where: { id: userId } }
+        { where: { id: userId.userId } }
       );
-      return res
-        .status(200)
-        .json({ message: "Successfully changed password!" });
+      console.log("succesfully updated password in database");
+      return res.status(200).json({ message: "Succesfully changed password" });
     } else {
-      return res
-        .status(409)
-        .json({ message: "Link is already Used Once, Request for new Link!" });
+      res.status(409).json({ message: "Failed to change password!" });
     }
   } catch (err) {
     console.log(err);

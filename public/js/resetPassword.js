@@ -1,6 +1,7 @@
 const resetPasswordBtn = document.getElementById("resetPasswordBtn");
 
-async function updatePassword() {
+async function updatePassword(e) {
+  e.preventDefault();
   try {
     const newPassword = document.getElementById("newPassword").value;
     const res = await axios.post(
@@ -9,6 +10,7 @@ async function updatePassword() {
         password: newPassword,
       }
     );
+    console.log(res.data.message);
     alert(res.data.message);
     window.location.href = "/user/login";
   } catch (error) {

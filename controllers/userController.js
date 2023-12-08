@@ -14,6 +14,16 @@ function generateAccessToken(id, email) {
   return jwt.sign({ userId: id, email: email }, process.env.TOKEN);
 }
 
+exports.isPremiumUser = async (req, res, next) => {
+  try {
+    if (req.user.isPremiumUser) {
+      return res.json({ isPremiumUser: true });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 /*
   Express route handler: Renders the sign-up page.
 */

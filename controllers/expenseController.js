@@ -59,3 +59,20 @@ exports.getAllExpenses = async (req, res, next) => {
     console.log(err);
   }
 };
+
+exports.deleteExpense = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const expense = await Expense.findByPk(id);
+    await User.update(
+      {
+        totalExpenses: req.user.totalExpenses - expense.amount,
+      },
+      { where: { id: req.user.id } }
+    );
+    await Expense.destroy({ where: { id: id, userId: req.user.id } });
+    res.redirect("/homePage");
+  } catch (err) {
+    console.log(err);
+  }
+};

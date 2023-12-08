@@ -214,9 +214,28 @@ async function buyPremium(e) {
   rzp1.open();
   e.preventDefault();
 }
+async function deleteExpense(e) {
+  try {
+    const token = localStorage.getItem("token");
+    if (e.target.classList.contains("delete")) {
+      let tr = e.target.parentElement.parentElement;
+      let id = tr.children[0].textContent;
+      const res = await axios.get(
+        `http://localhost:3000/expense/deleteExpense/${id}`,
+        { headers: { Authorization: token } }
+      );
+      window.location.reload();
+    }
+  } catch {
+    (err) => console.log(err);
+  }
+}
 
 logoutBtn.addEventListener("click", logout);
 document.addEventListener("DOMContentLoaded", isPremiumUser);
 buyPremiumBtn.addEventListener("click", buyPremium);
 addExpenseBtn.addEventListener("click", addExpense);
 document.addEventListener("DOMContentLoaded", getAllExpenses);
+table.addEventListener("click", (e) => {
+  deleteExpense(e);
+});

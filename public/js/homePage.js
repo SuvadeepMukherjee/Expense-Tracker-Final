@@ -9,6 +9,14 @@ const reportsLink = document.getElementById("reportsLink");
 const leaderboardLink = document.getElementById("leaderboardLink");
 const logoutBtn = document.getElementById("logoutBtn");
 
+categoryItems.forEach((item) => {
+  item.addEventListener("click", (e) => {
+    const selectedCategory = e.target.getAttribute("data-value");
+    categoryBtn.textContent = e.target.textContent;
+    categoryInput.value = selectedCategory;
+  });
+});
+
 function logout() {
   localStorage.clear();
   window.location.href = "/user/login";
@@ -27,6 +35,67 @@ async function isPremiumUser() {
     reportsLink.setAttribute("href", "/reports/getReportsPage");
     buyPremiumBtn.removeEventListener("click", buyPremium);
   } else {
+  }
+}
+
+async function addExpense() {
+  try {
+    const category = document.getElementById("categoryBtn");
+    const description = document.getElementById("descriptionValue");
+    const amount = document.getElementById("amountValue");
+    const categoryValue = category.textContent.trim();
+    const descriptionValue = description.value.trim();
+    const amountValue = amount.value.trim();
+
+    if (categoryValue == "Select Category") {
+      alert("Select the Category!");
+      window.location.href("/homePage");
+    }
+    if (!descriptionValue) {
+      alert("Add the Description!");
+      window.location.href("/homePage");
+    }
+    if (!parseInt(amountValue)) {
+      alert("Please enter the valid amount!");
+      window.location.href("/homePage");
+    }
+
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    // add leading zeros to day and month if needed
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+
+    // create the date string in date-month-year format
+    const dateStr = `${formattedDay}-${formattedMonth}-${year}`;
+
+    // console.log(dateStr); // outputs something like "23-02-2023"
+
+    const token = localStorage.getItem("token");
+    const res = await axios
+      .post(
+        "http://localhost:3000/expense/addExpense",
+        {
+          date: dateStr,
+          category: categoryValue,
+          description: descriptionValue,
+          amount: parseInt(amountValue),
+        },
+        { headers: { Authorization: token } }
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          window.location.reload();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } catch {
+    console.error("AddExpense went wrong");
   }
 }
 
@@ -69,3 +138,4 @@ async function buyPremium(e) {
 logoutBtn.addEventListener("click", logout);
 document.addEventListener("DOMContentLoaded", isPremiumUser);
 buyPremiumBtn.addEventListener("click", buyPremium);
+addExpenseBtn.addEventListener("click", addExpense);

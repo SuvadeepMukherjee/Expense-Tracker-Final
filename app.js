@@ -26,11 +26,17 @@ const sequelize = require("./util/database");
 
 const User = require("./models/userModel");
 const ResetPassword = require("./models/resetPasswordModel");
+const Expense = require("./models/expenseModel");
+const Order = require("./models/ordersModel");
 
 app.use("/user", userRouter);
 app.use("/password", resetPasswordRouter);
 app.use("/homePage", expenseRouter);
 
+User.hasMany(Expense);
+Expense.belongsTo(User);
+User.hasMany(Order);
+Order.belongsTo(User);
 ResetPassword.belongsTo(User);
 User.hasMany(ResetPassword);
 

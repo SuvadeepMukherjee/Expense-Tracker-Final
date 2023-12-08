@@ -19,7 +19,8 @@ async function loginUser(e) {
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
         console.log("succesfully logged in");
-        //window.location.href = "/homePage";
+        alert("you are succesfully logged in to your account");
+        window.location.href = "/homePage";
       }
     })
     .catch((err) => {

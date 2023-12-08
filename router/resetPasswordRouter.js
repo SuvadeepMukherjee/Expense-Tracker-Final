@@ -9,4 +9,6 @@ router.get(
   "/resetPasswordPage/:requestId",
   resetPasswordController.resetPasswordPage
 );
+router.post("/resetPassword", resetPasswordController.updatePassword);
+
 module.exports = router;

@@ -12,6 +12,10 @@ exports.forgotPasswordPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "forgotPassword.html"));
 };
 
+exports.resetPasswordPage = (req, res, next) => {
+  res.sendFile(path.join(rootDir, "views", "resetPassword.html"));
+};
+
 exports.sendMail = async (req, res, next) => {
   try {
     const email = req.body.email;

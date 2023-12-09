@@ -14,10 +14,16 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, saltRounds);
 };
 
+/*
+  Express route handler: Renders the forgot-password page.
+*/
 exports.forgotPasswordPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "forgotPassword.html"));
 };
 
+/*
+  Express route handler: Renders the reset-password page.
+*/
 exports.resetPasswordPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "resetPassword.html"));
 };

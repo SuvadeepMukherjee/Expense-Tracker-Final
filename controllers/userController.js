@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const rootDir = require("../util/path");
 const User = require("../models/userModel");
+const sequelize = require("../util/database");
 
 /*
   This function generates an access token using the provided user ID and email.

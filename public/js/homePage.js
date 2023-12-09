@@ -205,13 +205,14 @@ async function buyPremium(e) {
       alert(
         "Welcome to our Premium Membership, You have now access to Reports and LeaderBoard"
       );
-      window.location.reload();
+
       localStorage.setItem("token", token);
     },
   };
   const rzp1 = new Razorpay(options);
 
   rzp1.open();
+  //window.location.reload();
   e.preventDefault();
 }
 async function deleteExpense(e) {

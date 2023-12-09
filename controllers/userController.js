@@ -147,3 +147,23 @@ exports.postUserLogin = async (req, res, next) => {
     });
   }
 };
+
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    User.findAll({
+      attributes: [
+        [sequelize.col("name"), "name"],
+        [sequelize.col("totalExpenses"), "totalExpenses"],
+      ],
+      order: [[sequelize.col("totalExpenses"), "DESC"]],
+    }).then((users) => {
+      const result = users.map((user) => ({
+        name: user.getDataValue("name"),
+        totalExpenses: user.getDataValue("totalExpenses"),
+      }));
+      res.send(JSON.stringify(result));
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

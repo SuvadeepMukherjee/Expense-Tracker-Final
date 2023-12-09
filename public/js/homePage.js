@@ -212,7 +212,12 @@ async function buyPremium(e) {
   const rzp1 = new Razorpay(options);
 
   rzp1.open();
-  //window.location.reload();
+  buyPremiumBtn.innerHTML = "Premium Member &#128081";
+  reportsLink.removeAttribute("onclick");
+  leaderboardLink.removeAttribute("onclick");
+  leaderboardLink.setAttribute("href", "/premium/getLeaderboardPage");
+  reportsLink.setAttribute("href", "/reports/getReportsPage");
+  buyPremiumBtn.removeEventListener("click", buyPremium);
   e.preventDefault();
 }
 async function deleteExpense(e) {

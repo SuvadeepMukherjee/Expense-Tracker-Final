@@ -1,13 +1,20 @@
 const express = require("express");
-const app = express();
-
+const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-// Enable Cross-Origin Resource Sharing (CORS)
+const app = express();
+
+/*
+ Enable Cross-Origin Resource Sharing (CORS) to accept requests from 
+ domains other than its own.
+ */
 app.use(cors());
 
-const dotenv = require("dotenv");
+/*
+loads and configures environment variables from a .env file
+ into the Node.js application using the 'dotenv' package.
+ */
 dotenv.config();
 
 // Serve static files from the "public" directory

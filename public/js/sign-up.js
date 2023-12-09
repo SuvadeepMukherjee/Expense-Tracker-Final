@@ -3,6 +3,8 @@ const email = document.getElementById("email");
 const password = document.getElementById("password");
 const backendResponse = document.getElementById("backend-response");
 
+// Handles user signup, sends a POST request with user data to the server using axios,
+// and redirects to the login page upon success. Displays an error message if the email already exists.
 async function createUser(e) {
   e.preventDefault();
   const nameValue = namee.value;

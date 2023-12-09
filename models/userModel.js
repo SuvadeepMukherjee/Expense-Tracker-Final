@@ -1,6 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
 
+// Defines a Sequelize model 'User' for the 'users' table with
+// specified attributes and data types.
+
 const User = sequelize.define("users", {
   id: {
     type: Sequelize.INTEGER,

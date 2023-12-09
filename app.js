@@ -24,6 +24,7 @@ const resetPasswordRouter = require("./router/resetPasswordRouter");
 const expenseRouter = require("./router/expenseRouter");
 const purchaseMembershipRouter = require("./router/purchaseMembershipRouter");
 const leaderboardRouter = require("./router/leaderboardRouter");
+const reportsRouter = require("./router/reportsRouter");
 const sequelize = require("./util/database");
 
 const User = require("./models/userModel");
@@ -37,6 +38,7 @@ app.use("/homePage", expenseRouter);
 app.use("/expense", expenseRouter);
 app.use("/purchase", purchaseMembershipRouter);
 app.use("/premium", leaderboardRouter);
+app.use("/reports", reportsRouter);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);

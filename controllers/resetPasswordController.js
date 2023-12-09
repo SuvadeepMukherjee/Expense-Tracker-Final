@@ -3,13 +3,14 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const Sib = require("sib-api-v3-sdk");
 const bcrypt = require("bcrypt");
-const saltRounds = 10;
 
 const rootDir = require("../util/path");
 
 const User = require("../models/userModel");
 const ResetPassword = require("../models/resetPasswordModel");
 
+// Hashes a password using bcrypt with a specified number of salt rounds.
+const saltRounds = 10;
 const hashPassword = async (password) => {
   return await bcrypt.hash(password, saltRounds);
 };
@@ -28,6 +29,20 @@ exports.resetPasswordPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "resetPassword.html"));
 };
 
+/*
+  Handles a POST request to the "/password/sendMail" endpoint.
+
+  - Extract email from the request body.
+  - Generate a unique request ID.
+  - Find the user with the provided email in the database.
+  - If the user is found, create a reset request in the database.
+  - Configure Sendinblue API for sending transactional emails.
+  - Send an email to the user with a password reset link.
+    (The link includes the unique request ID as a parameter.)
+  - Return a 200 status with a success message on successful email send.
+  - Return a 404 status for an invalid email.
+  - Return a 409 status for a failed password change.
+*/
 exports.sendMail = async (req, res, next) => {
   try {
     const email = req.body.email;
@@ -86,6 +101,19 @@ exports.sendMail = async (req, res, next) => {
   }
 };
 
+/*
+  
+  Handles a POST request to the "/password/resetPassword" endpoint.
+
+  - Extracts the request ID from the referer header.
+  - Extracts the new password from the request body.
+  - Checks if the reset request associated with the ID is active.
+  - If active, updates the reset request status to inactive.
+  - Hashes the new password.
+  - Updates the user's password in the database.
+  - Returns a 200 status with a success message upon successful password change.
+  - Returns a 409 status for a failed password change.
+*/
 exports.updatePassword = async (req, res, next) => {
   try {
     const requestId = req.headers.referer.split("/");

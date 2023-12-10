@@ -9,6 +9,15 @@ const reportsLink = document.getElementById("reportsLink");
 const leaderboardLink = document.getElementById("leaderboardLink");
 const logoutBtn = document.getElementById("logoutBtn");
 
+/**
+ * Event Listener for Category Items
+ * - Iterates through each category item in the categoryItems collection.
+ * - Listens for a click event on each category item.
+ * - Retrieves the selected category value from the clicked item's "data-value" attribute.
+ * - Updates the text content of the categoryBtn with the selected category name.
+ * - Sets the value of the categoryInput hidden field to the selected category.
+ * @param {Event} e - The click event triggered by clicking a category item.
+ */
 categoryItems.forEach((item) => {
   item.addEventListener("click", (e) => {
     const selectedCategory = e.target.getAttribute("data-value");

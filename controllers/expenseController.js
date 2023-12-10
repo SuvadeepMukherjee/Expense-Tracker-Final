@@ -12,6 +12,15 @@ exports.getHomePage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "homePage.html"));
 };
 
+/**
+ * addExpense controller
+ * - Initiates a database transaction using Sequelize.
+ * - Extracts date, category, description, and amount from the request body.
+ * - Updates the totalExpenses of the authenticated user in the database.
+ * - Creates a new Expense record in the database with the provided details.
+ * - Commits the transaction and responds with a 200 status, redirecting to the "/homePage".
+ * - Rolls back the transaction and logs any errors that occur during the process.
+ */
 exports.addExpense = async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
@@ -54,6 +63,12 @@ exports.addExpense = async (req, res, next) => {
   }
 };
 
+/**
+ * getAllExpenses controller
+ * - Retrieves all expenses associated with the authenticated user.
+ * - Uses Sequelize to query the database and fetch expenses based on the user ID.
+ * - Responds with a JSON array containing the retrieved expenses.
+ */
 exports.getAllExpenses = async (req, res, next) => {
   try {
     const expenses = await Expense.findAll({ where: { userId: req.user.id } });
@@ -63,6 +78,14 @@ exports.getAllExpenses = async (req, res, next) => {
   }
 };
 
+/**
+ * deleteExpense controller
+ * - Extracts expense ID from the request parameters.
+ * - Retrieves the existing expense using the ID.
+ * - Updates the totalExpenses of the authenticated user by subtracting the expense amount.
+ * - Deletes the expense record from the database.
+ * - Redirects to the "/homePage" after successful deletion.
+ */
 exports.deleteExpense = async (req, res, next) => {
   const id = req.params.id;
   try {
@@ -80,6 +103,14 @@ exports.deleteExpense = async (req, res, next) => {
   }
 };
 
+/**
+ * editExpense controller
+ * - Extracts expense ID, category, description, and amount from the request parameters and body.
+ * - Retrieves the existing expense using the ID.
+ * - Updates the totalExpenses of the authenticated user by adjusting for the changes in the expense amount.
+ * - Updates the expense details in the database.
+ * - Redirects to the "/homePage" after successful update.
+ */
 exports.editExpense = async (req, res, next) => {
   try {
     const id = req.params.id;

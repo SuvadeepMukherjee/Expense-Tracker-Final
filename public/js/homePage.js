@@ -200,6 +200,15 @@ async function isPremiumUser() {
   }
 }
 
+/**
+ * - Retrieves category, description, and amount input elements from the DOM.
+ * - Validates input values, displaying alerts for missing or invalid entries.
+ * - Generates the current date in the "day-month-year" format.
+ * - Sends a POST request to the server to add a new expense with the provided details.
+ * - Reloads the page upon successful addition of the expense.
+ *
+ * Note: Ensure that the "categoryBtn," "descriptionValue," and "amountValue" elements exist in the DOM.
+ */
 async function addExpense() {
   try {
     const category = document.getElementById("categoryBtn");
@@ -221,21 +230,13 @@ async function addExpense() {
       alert("Please enter the valid amount!");
       window.location.href("/homePage");
     }
-
     const currentDate = new Date();
     const day = currentDate.getDate();
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
-
-    // add leading zeros to day and month if needed
     const formattedDay = day < 10 ? `0${day}` : day;
     const formattedMonth = month < 10 ? `0${month}` : month;
-
-    // create the date string in date-month-year format
     const dateStr = `${formattedDay}-${formattedMonth}-${year}`;
-
-    // console.log(dateStr); // outputs something like "23-02-2023"
-
     const token = localStorage.getItem("token");
     const res = await axios
       .post(
@@ -274,12 +275,9 @@ async function buyPremium(e) {
     "http://localhost:3000/purchase/premiumMembership",
     { headers: { Authorization: token } }
   );
-  console.log(res);
-
   var options = {
-    key: res.data.key_id, // Enter the Key ID generated from the Dashboard
-    order_id: res.data.order.orderid, // For one time payment
-    // This handler function will handle the success payment
+    key: res.data.key_id,
+    order_id: res.data.order.orderid,
     handler: async function (response) {
       const res = await axios.post(
         "http://localhost:3000/purchase/updateTransactionStatus",
@@ -289,7 +287,6 @@ async function buyPremium(e) {
         },
         { headers: { Authorization: token } }
       );
-
       console.log(res);
       alert(
         "Welcome to our Premium Membership, You have now access to Reports and LeaderBoard"
@@ -299,11 +296,17 @@ async function buyPremium(e) {
     },
   };
   const rzp1 = new Razorpay(options);
-
   rzp1.open();
-
   e.preventDefault();
 }
+
+/**
+ * deleteExpense function
+ * - Retrieves authentication token.
+ * - Checks if the clicked element has the "delete" class.
+ * - Retrieves the expense ID from the corresponding table row.
+ * - Sends a request to the server to delete the expense with the specified ID.
+ */
 async function deleteExpense(e) {
   try {
     const token = localStorage.getItem("token");
@@ -314,11 +317,24 @@ async function deleteExpense(e) {
         `http://localhost:3000/expense/deleteExpense/${id}`,
         { headers: { Authorization: token } }
       );
+      window.location.reload();
     }
   } catch {
     (err) => console.log(err);
   }
 }
+
+/**
+ * editExpense function
+ * - Retrieves authentication token and DOM elements representing category, description, amount, and the submit button.
+ * - Checks if the clicked element has the "edit" class.
+ * - Retrieves the expense ID from the corresponding table row.
+ * - Fetches all expenses from the server to find the expense with the matching ID.
+ * - Fills the input values with the existing values of the selected expense.
+ * - Modifies the behavior of the submit button to update the existing expense when clicked.
+ * - Sends a request to the server to update the expense details.
+ * - Reloads the page upon successful update.
+ */
 async function editExpense(e) {
   try {
     const token = localStorage.getItem("token");
@@ -365,7 +381,6 @@ async function editExpense(e) {
     (err) => console.log(err);
   }
 }
-
 logoutBtn.addEventListener("click", logout);
 document.addEventListener("DOMContentLoaded", isPremiumUser);
 buyPremiumBtn.addEventListener("click", buyPremium);

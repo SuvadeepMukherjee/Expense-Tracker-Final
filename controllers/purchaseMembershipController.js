@@ -17,7 +17,7 @@ exports.purchasePremium = async (req, res) => {
       key_id: process.env.RZP_KEY_ID,
       key_secret: process.env.RZP_KEY_SECRET,
     });
-    const amount = 100000;
+    const amount = 1000;
     rzp.orders.create({ amount, currency: "INR" }, async (err, order) => {
       const createdOrder = await Order.create({
         orderid: order.id,

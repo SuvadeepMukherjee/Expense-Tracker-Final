@@ -185,6 +185,14 @@ async function logout() {
   }
 }
 
+/**
+ * Function: download
+ * - Initiates a file download by making a GET request to a server endpoint.
+ * - The request includes an authorization token retrieved from the local storage.
+ * - If the server responds with a 201 status code, it extracts the file URL
+ *   from the response and triggers a download for the file named "myexpense.csv".
+ * - In case of any errors, the function logs the error to the console.
+ */
 const download = () => {
   const token = localStorage.getItem("token");
   axios
@@ -194,20 +202,12 @@ const download = () => {
     .then((response) => {
       if (response.status === 201) {
         const fileURL = response.data.fileURL;
-
-        // Create a hidden link
         const a = document.createElement("a");
         a.style.display = "none";
         document.body.appendChild(a);
-
-        // Set the href and download attributes
         a.href = fileURL;
         a.download = "myexpense.csv";
-
-        // Simulate a click on the link to trigger the download
         a.click();
-
-        // Remove the link from the DOM
         document.body.removeChild(a);
       } else {
         throw new Error(response.data.message);

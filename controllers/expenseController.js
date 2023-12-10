@@ -165,6 +165,13 @@ exports.getAllExpensesforPagination = async (req, res, next) => {
   }
 };
 
+/**
+ * uploadToS3 Utility Function
+ * - Uploads the provided data to an Amazon S3 bucket.
+ * - Requires the BUCKET_NAME, IAM_USER_KEY, and IAM_USER_SECRET to be set as environment variables.
+ * - Returns a Promise that resolves with the S3 bucket location of the uploaded file.
+ * - Logs success or error messages to the console.
+ */
 function uploadTos3(data, filename) {
   const BUCKET_NAME = process.env.BUCKET_NAME;
   const IAM_USER_KEY = process.env.IAM_USER_KEY;
@@ -193,6 +200,17 @@ function uploadTos3(data, filename) {
     });
   });
 }
+
+/**
+ * downloadExpense Controller
+ * - Logs the authenticated user information to the console.
+ * - Retrieves the user ID from the request and queries the database for the user's expenses.
+ * - Stringifies the expenses array and logs it to the console.
+ * - Generates a file name based on the user ID and current date.
+ * - Uploads the stringified expenses to an S3 bucket and retrieves the file URL.
+ * - Creates a new record in the UrlModel with the download URL and user ID.
+ * - Responds with a JSON object containing the file URL and success message.
+ */
 exports.downloadExpense = async (req, res, next) => {
   console.log(req.user);
   const userid = req.user.dataValues.id;

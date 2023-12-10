@@ -38,6 +38,7 @@ const User = require("./models/userModel");
 const ResetPassword = require("./models/resetPasswordModel");
 const Expense = require("./models/expenseModel");
 const Order = require("./models/ordersModel");
+const UrlDownloads = require("./models/urlModel");
 
 app.use("/user", userRouter);
 app.use("/password", resetPasswordRouter);
@@ -51,8 +52,10 @@ User.hasMany(Expense);
 Expense.belongsTo(User);
 User.hasMany(Order);
 Order.belongsTo(User);
-ResetPassword.belongsTo(User);
 User.hasMany(ResetPassword);
+ResetPassword.belongsTo(User);
+User.hasMany(UrlDownloads);
+UrlDownloads.belongsTo(User);
 
 sequelize.sync().then((result) => {
   app.listen(3000);

@@ -7,9 +7,19 @@ const monthInput = document.getElementById("month");
 const monthShowBtn = document.getElementById("monthShowBtn");
 const tbodyMonthly = document.getElementById("tbodyMonthlyId");
 const tfootMonthly = document.getElementById("tfootMonthlyId");
-
 const logoutBtn = document.getElementById("logoutBtn");
 
+/*
+  Function: getDailyReport
+
+  Description:
+  This asynchronous function handles the submission of a form to fetch and display daily expense reports.
+  - Retrieves the authorization token from local storage.
+  - Formats the selected date for the report.
+  - Makes an asynchronous POST request to the server to fetch daily reports.
+  - Populates the HTML table with the fetched data and calculates the total amount.
+  - Handles errors by logging them to the console.
+*/
 async function getDailyReport(e) {
   try {
     e.preventDefault();
@@ -81,6 +91,20 @@ async function getDailyReport(e) {
     console.log(error);
   }
 }
+
+
+/*
+  Function: getMonthlyReport
+
+  Description:
+  This asynchronous function handles the submission of a form to fetch and display monthly expense reports.
+  - Retrieves the authorization token from local storage.
+  - Formats the selected month for the report.
+  - Makes an asynchronous POST request to the server to fetch monthly reports.
+  - Populates the HTML table with the fetched data and calculates the total amount.
+  - Handles errors by logging them to the console.
+
+*/
 
 async function getMonthlyReport(e) {
   try {

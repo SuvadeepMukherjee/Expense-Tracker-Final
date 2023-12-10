@@ -3,13 +3,20 @@ const Order = require("../models/ordersModel");
 const User = require("../models/userModel");
 const userController = require("./userController");
 
+/**
+ * purchasePremium controller
+ * - Initializes a new instance of Razorpay with the provided key ID and key secret.
+ * - Sets the amount for the premium membership purchase.
+ * - Creates a Razorpay order with the specified amount and currency (INR).
+ * - Generates a new order record in the database with the status set to "PENDING" and associates it with the requesting user.
+ * - Responds to the client with the created order details and the Razorpay key ID.
+ */
 exports.purchasePremium = async (req, res) => {
   try {
     var rzp = new Razorpay({
       key_id: process.env.RZP_KEY_ID,
       key_secret: process.env.RZP_KEY_SECRET,
     });
-
     const amount = 100000;
     rzp.orders.create({ amount, currency: "INR" }, async (err, order) => {
       const createdOrder = await Order.create({
@@ -26,29 +33,31 @@ exports.purchasePremium = async (req, res) => {
   }
 };
 
+/**
+ * updateTransactionStatus controller
+ * - Retrieves payment and order information from the request body.
+ * - Finds the corresponding order in the database using the provided order ID.
+ * - Updates the order status to "SUCCESSFUL" and associates the payment ID.
+ * - Updates the user's status to indicate they are now a premium user.
+ * - Responds to the client with a 202 status and a success message for a successful transaction.
+ */
+
 exports.updateTransactionStatus = async (req, res) => {
   try {
     console.log("inside upadate transaction status");
     console.log("body of req.body", req.body);
-    //const { payment_id, order_id } = req.body;
-    //console.log("body of req.user.dataValues.id", req.user.dataValues.id);
-
     const payment_id = req.body.payment_id;
     const order_id = req.body.order_id;
-
     const order = await Order.findOne({ where: { orderid: order_id } });
-
-    // Update the specific order record
     const updateData = {
       paymentid: payment_id,
       status: "SUCCESSFUL",
     };
     await Order.update(updateData, {
       where: {
-        orderid: order_id, // Specify the condition for the update
+        orderid: order_id,
       },
     });
-
     const updateUser = {
       isPremiumUser: true,
     };

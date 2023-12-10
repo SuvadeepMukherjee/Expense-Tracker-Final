@@ -1,5 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
+
+// Defines a Sequelize model 'Order' for the 'order' table with
+// specified attributes and data types.
 const Order = sequelize.define("order", {
   id: {
     type: Sequelize.INTEGER,

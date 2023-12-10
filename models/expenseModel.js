@@ -1,6 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
 
+// Defines a Sequelize model 'Expenses' for the 'expenses' table with
+// specified attributes and data types.
+
 const Expenses = sequelize.define("expenses", {
   id: {
     type: Sequelize.INTEGER,

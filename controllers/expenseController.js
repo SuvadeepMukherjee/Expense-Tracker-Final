@@ -5,6 +5,9 @@ const Expense = require("../models/expenseModel");
 const User = require("../models/userModel");
 const sequelize = require("../util/database");
 
+/*
+  Express route handler: Renders the expense-home page.
+*/
 exports.getHomePage = (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "homePage.html"));
 };

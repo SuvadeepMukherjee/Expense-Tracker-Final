@@ -15,6 +15,10 @@ function generateAccessToken(id, email) {
   return jwt.sign({ userId: id, email: email }, process.env.TOKEN);
 }
 
+/**
+ * - Checks if the authenticated user is a premium member.
+ * - Responds to the client with a JSON object indicating the premium membership status.
+ */
 exports.isPremiumUser = async (req, res, next) => {
   try {
     if (req.user.isPremiumUser) {
@@ -55,18 +59,13 @@ exports.postUserSignUp = async (req, res, next) => {
     const name = req.body.nameValue;
     const email = req.body.emailValue;
     const password = req.body.passwordValue;
-
-    // Check if the email already exists in the database
     const existingUser = await User.findOne({ where: { email: email } });
 
     if (existingUser) {
-      // Email already taken
       return res.status(409).json({
         error: "This email is already taken. Please choose another one.",
       });
     }
-
-    // Hash the password and create a new user
     bcrypt.hash(password, 10, async (err, hash) => {
       await User.create({
         name: name,
@@ -74,8 +73,6 @@ exports.postUserSignUp = async (req, res, next) => {
         password: hash,
       });
     });
-
-    // Respond with success status
     res.status(200).json({
       success: true,
       message: "Login Successful!",

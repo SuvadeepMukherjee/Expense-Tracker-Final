@@ -165,11 +165,25 @@ async function paginationBtn(e) {
   }
 }
 
+/*
+  - Clears local storage and redirects the user to the login page.
+ */
 function logout() {
   localStorage.clear();
   window.location.href = "/user/login";
 }
 
+/**
+ * isPremiumUser function
+ * - Retrieves the user's authentication token from local storage.
+ * - Sends a request to the server to check if the user is a premium member.
+ * - Updates the user interface based on the premium membership status:
+ *    - If the user is a premium member:
+ *      - Modifies the appearance and functionality of the "buyPremiumBtn" button.
+ *      - Adjusts the links and behavior of the "reportsLink" and "leaderboardLink" elements.
+ *      - Removes the "buyPremium" click event listener from the button.
+ *    - If the user is not a premium member, takes no further action.
+ */
 async function isPremiumUser() {
   const token = localStorage.getItem("token");
   const res = await axios.get("http://localhost:3000/user/isPremiumUser", {
@@ -247,6 +261,13 @@ async function addExpense() {
   }
 }
 
+/**
+ * - Initiates the process of purchasing a premium membership by requesting a payment order from the server.
+ * - Utilizes Razorpay for payment processing, handling the entire purchase workflow.
+ * - Updates the transaction status on the server after successful payment.
+ * - Notifies the user about their upgraded membership status.
+ * - Stores the updated authentication token in the local storage for future requests.
+ */
 async function buyPremium(e) {
   const token = localStorage.getItem("token");
   const res = await axios.get(
@@ -273,13 +294,14 @@ async function buyPremium(e) {
       alert(
         "Welcome to our Premium Membership, You have now access to Reports and LeaderBoard"
       );
-
+      window.location.reload();
       localStorage.setItem("token", token);
     },
   };
   const rzp1 = new Razorpay(options);
 
   rzp1.open();
+
   e.preventDefault();
 }
 async function deleteExpense(e) {
@@ -292,7 +314,6 @@ async function deleteExpense(e) {
         `http://localhost:3000/expense/deleteExpense/${id}`,
         { headers: { Authorization: token } }
       );
-      window.location.reload();
     }
   } catch {
     (err) => console.log(err);

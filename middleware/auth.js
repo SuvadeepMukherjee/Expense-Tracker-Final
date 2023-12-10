@@ -1,11 +1,11 @@
+const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
+
 /*
 This middleware (authenticate) checks for a valid JWT in the "Authorization" header. 
 If the token is valid, it retrieves the corresponding user from the database and attaches it to the request
  (req.user). If any error occurs, it logs the error and sends a 401 Unauthorized response with { success: false }.
 */
-
-const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
 const authenticate = (req, res, next) => {
   try {
     const token = req.header("Authorization");

@@ -26,14 +26,27 @@ categoryItems.forEach((item) => {
   });
 });
 
+/**
+ * getAllExpenses Function
+ * - Retrieves expenses data from the server for the first page.
+ * - Populates the HTML table with the fetched expenses, including ID, date, category, description, and amount.
+ * - Generates and appends pagination links based on the total number of pages.
+ * - Adds click event listeners to the pagination links for handling page navigation.
+ *
+ * @returns {Promise<void>} - A Promise that resolves after handling the getAllExpenses operation.
+ */
 async function getAllExpenses() {
-  // e.preventDefault();
   try {
+    // Retrieve the authorization token from local storage
     const token = localStorage.getItem("token");
+
+    // Make a GET request to the server to fetch expenses for the first page
     const res = await axios.get(
       "http://localhost:3000/expense/getAllExpenses/1",
       { headers: { Authorization: token } }
     );
+
+    // Populate the HTML table with the fetched expenses
     res.data.expenses.forEach((expenses) => {
       const id = expenses.id;
       const date = expenses.date;
@@ -43,7 +56,6 @@ async function getAllExpenses() {
 
       let tr = document.createElement("tr");
       tr.className = "trStyle";
-
       table.appendChild(tr);
 
       let idValue = document.createElement("th");
@@ -52,7 +64,6 @@ async function getAllExpenses() {
 
       let th = document.createElement("th");
       th.setAttribute("scope", "row");
-
       tr.appendChild(idValue);
       tr.appendChild(th);
 
@@ -87,8 +98,7 @@ async function getAllExpenses() {
       tr.appendChild(td4);
     });
 
-    // ---------------------------------------------------------------------//
-
+    // Generate and append pagination links based on the total number of pages
     const ul = document.getElementById("paginationUL");
     for (let i = 1; i <= res.data.totalPages; i++) {
       const li = document.createElement("li");
@@ -99,24 +109,45 @@ async function getAllExpenses() {
       a.appendChild(document.createTextNode(i));
       li.appendChild(a);
       ul.appendChild(li);
+
+      // Add click event listeners to the pagination links for handling page navigation
       a.addEventListener("click", paginationBtn);
     }
-  } catch {
-    (err) => console.log(err);
+  } catch (err) {
+    console.log(err);
   }
 }
 
+/**
+ * paginationBtn Function
+ * - Retrieves the page number from the clicked pagination button.
+ * - Retrieves the authorization token from local storage.
+ * - Makes a GET request to the server to fetch expenses for the specified page.
+ * - Clears the content of the HTML table.
+ * - Populates the table with the fetched expenses, including ID, date, category, description, amount.
+ * - Creates Delete and Edit buttons for each expense and adds event listeners to them.
+ *
+ * @param {Event} e - The click event object from the pagination button.
+ * @returns {Promise<void>} - A Promise that resolves after handling the paginationBtn operation.
+ */
 async function paginationBtn(e) {
   try {
+    // Retrieve the page number from the clicked pagination button
     const pageNo = e.target.textContent;
+
+    // Retrieve the authorization token from local storage
     const token = localStorage.getItem("token");
+
+    // Make a GET request to the server to fetch expenses for the specified page
     const res = await axios.get(
       `http://localhost:3000/expense/getAllExpenses/${pageNo}`,
       { headers: { Authorization: token } }
     );
 
+    // Clear the content of the HTML table
     table.innerHTML = "";
 
+    // Populate the table with the fetched expenses
     res.data.expenses.forEach((expenses) => {
       const id = expenses.id;
       const date = expenses.date;
@@ -124,24 +155,25 @@ async function paginationBtn(e) {
       const descriptionValue = expenses.description;
       const amountValue = expenses.amount;
 
+      // Create table row
       let tr = document.createElement("tr");
       tr.className = "trStyle";
-
       table.appendChild(tr);
 
+      // Create and append table cells for ID and Date
       let idValue = document.createElement("th");
       idValue.setAttribute("scope", "row");
       idValue.setAttribute("style", "display: none");
 
       let th = document.createElement("th");
       th.setAttribute("scope", "row");
-
       tr.appendChild(idValue);
       tr.appendChild(th);
 
       idValue.appendChild(document.createTextNode(id));
       th.appendChild(document.createTextNode(date));
 
+      // Create and append table cells for Category, Description, and Amount
       let td1 = document.createElement("td");
       td1.appendChild(document.createTextNode(categoryValue));
 
@@ -151,6 +183,7 @@ async function paginationBtn(e) {
       let td3 = document.createElement("td");
       td3.appendChild(document.createTextNode(amountValue));
 
+      // Create and append table cell for Delete and Edit buttons
       let td4 = document.createElement("td");
 
       let deleteBtn = document.createElement("button");

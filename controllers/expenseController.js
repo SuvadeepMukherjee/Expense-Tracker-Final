@@ -145,20 +145,45 @@ exports.editExpense = async (req, res, next) => {
   }
 };
 
+/**
+ * getAllExpensesforPagination Controller
+ * - Retrieves the page number from the request parameters.
+ * - Sets the limit and offset for pagination based on the page number.
+ * - Counts the total number of expenses for the authenticated user.
+ * - Calculates the total number of pages based on the limit and total expenses.
+ * - Queries the database for expenses based on the calculated offset and limit.
+ * - Responds with a JSON object containing the fetched expenses and total number of pages.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {function} next - The next middleware function.
+ * @returns {Promise<void>} - A Promise that resolves after handling the getAllExpensesforPagination operation.
+ */
 exports.getAllExpensesforPagination = async (req, res, next) => {
   try {
+    // Retrieve the page number from the request parameters
     const pageNo = req.params.page;
+
+    // Set the limit and offset for pagination based on the page number
     const limit = 10;
     const offset = (pageNo - 1) * limit;
+
+    // Count the total number of expenses for the authenticated user
     const totalExpenses = await Expense.count({
       where: { userId: req.user.id },
     });
+
+    // Calculate the total number of pages based on the limit and total expenses
     const totalPages = Math.ceil(totalExpenses / limit);
+
+    // Query the database for expenses based on the calculated offset and limit
     const expenses = await Expense.findAll({
       where: { userId: req.user.id },
       offset: offset,
       limit: limit,
     });
+
+    // Respond with a JSON object containing the fetched expenses and total number of pages
     res.json({ expenses: expenses, totalPages: totalPages });
   } catch (err) {
     console.log(err);

@@ -8,6 +8,7 @@ const monthShowBtn = document.getElementById("monthShowBtn");
 const tbodyMonthly = document.getElementById("tbodyMonthlyId");
 const tfootMonthly = document.getElementById("tfootMonthlyId");
 const logoutBtn = document.getElementById("logoutBtn");
+const downloadBtn = document.getElementById("downloadExpense");
 
 /*
   Function: getDailyReport
@@ -91,7 +92,6 @@ async function getDailyReport(e) {
     console.log(error);
   }
 }
-
 
 /*
   Function: getMonthlyReport
@@ -179,12 +179,46 @@ async function getMonthlyReport(e) {
 async function logout() {
   try {
     localStorage.clear();
-    window.location.href = "/";
+    window.location.href = "/user/login";
   } catch (error) {
     console.log(error);
   }
 }
 
+const download = () => {
+  const token = localStorage.getItem("token");
+  axios
+    .get("http://localhost:3000/user/download", {
+      headers: { Authorization: token },
+    })
+    .then((response) => {
+      if (response.status === 201) {
+        const fileURL = response.data.fileURL;
+
+        // Create a hidden link
+        const a = document.createElement("a");
+        a.style.display = "none";
+        document.body.appendChild(a);
+
+        // Set the href and download attributes
+        a.href = fileURL;
+        a.download = "myexpense.csv";
+
+        // Simulate a click on the link to trigger the download
+        a.click();
+
+        // Remove the link from the DOM
+        document.body.removeChild(a);
+      } else {
+        throw new Error(response.data.message);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 dateShowBtn.addEventListener("click", getDailyReport);
 monthShowBtn.addEventListener("click", getMonthlyReport);
 logoutBtn.addEventListener("click", logout);
+downloadBtn.addEventListener("click", download);

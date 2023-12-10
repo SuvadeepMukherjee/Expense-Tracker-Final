@@ -4,6 +4,7 @@ const Expense = require("../models/expenseModel");
 const { Op } = require("sequelize");
 
 const rootDir = require("../util/path");
+const { log } = require("console");
 
 /*
   Controller Function: getReportsPage
@@ -106,18 +107,34 @@ function uploadTos3(data, filename) {
 exports.downloadExpense = async (req, res, next) => {
   console.log(req.user);
   const userid = req.user.dataValues.id;
+
   const expenses = await Expense.findAll({
     where: { userId: userid },
   });
+
   const stringifiedExpenses = JSON.stringify(expenses);
   console.log("The stringified expenses of the user is ", stringifiedExpenses);
-  const fileName = `Expenses${userid}/${new Date()}.txt`;
 
+  const fileName = `Expenses${userid}/${new Date()}.txt`;
   const fileURL = await uploadTos3(stringifiedExpenses, fileName);
-  console.log(fileURL);
-  await UrlModel.create({
-    url: fileURL,
-    userId: userid,
+
+  // Check if there is an existing entry for the user in UrlModel
+  const existingEntry = await UrlModel.findOne({
+    where: { userId: userid },
   });
+
+  if (existingEntry) {
+    // If an entry exists, update the URL
+    await existingEntry.update({ url: fileURL });
+    console.log("Existing entry updated:", fileURL);
+  } else {
+    // If no entry exists, create a new one
+    await UrlModel.create({
+      url: fileURL,
+      userId: userid,
+    });
+    console.log("New entry created:", fileURL);
+  }
+
   res.status(201).json({ fileURL, success: true, messageL: "File Downloaded" });
 };

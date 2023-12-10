@@ -9,6 +9,7 @@
   "author": "Suvadeep",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1515.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
@@ -22,6 +23,5 @@
     "sib-api-v3-sdk": "^8.5.0",
     "uuid": "^9.0.1"
   },
-  "devDependencies": {},
   "description": ""
 }

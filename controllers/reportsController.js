@@ -2,9 +2,9 @@ const path = require("path");
 
 const Expense = require("../models/expenseModel");
 const { Op } = require("sequelize");
-
+const AWS = require("aws-sdk");
 const rootDir = require("../util/path");
-const { log } = require("console");
+const UrlModel = require("../models/urlModel");
 
 /*
   Controller Function: getReportsPage
@@ -48,16 +48,13 @@ exports.dailyReports = async (req, res, next) => {
   - Uses Sequelize's 'Expense' model to query the database for expenses within the specified month.
   - Filters expenses based on both date (using Sequelize's [Op.like] operator) and user ID.
   - Sends the fetched expenses as the HTTP response.
-
+  - The 'raw: true' option in Sequelize's findAll() method instructs the query to return raw database records as plain JavaScript objects instead of Sequelize model instances. 
   Notes:
   - Utilizes Sequelize's [Op.like] operator to filter expenses by the specified month.
 */
 exports.monthlyReports = async (req, res, next) => {
   try {
-    // Retrieve the selected month from the request body
     const month = req.body.month;
-
-    // Use Sequelize's 'Expense' model to query the database for expenses within the specified month
     const expenses = await Expense.findAll({
       where: {
         date: {
@@ -67,15 +64,19 @@ exports.monthlyReports = async (req, res, next) => {
       },
       raw: true,
     });
-
-    // Send the fetched expenses as the HTTP response
     return res.send(expenses);
   } catch (error) {
-    // Log errors to the console
     console.log(error);
   }
 };
 
+/**
+ * uploadToS3 Utility Function
+ * - Uploads the provided data to an Amazon S3 bucket.
+ * - Requires the BUCKET_NAME, IAM_USER_KEY, and IAM_USER_SECRET to be set as environment variables.
+ * - Returns a Promise that resolves with the S3 bucket location of the uploaded file.
+ * - Logs success or error messages to the console.
+ */
 function uploadTos3(data, filename) {
   const BUCKET_NAME = process.env.BUCKET_NAME;
   const IAM_USER_KEY = process.env.IAM_USER_KEY;
@@ -104,6 +105,17 @@ function uploadTos3(data, filename) {
     });
   });
 }
+
+/**
+ * downloadExpense Controller
+ * - Logs the authenticated user information to the console.
+ * - Retrieves the user ID from the request and queries the database for the user's expenses.
+ * - Stringifies the expenses array and logs it to the console.
+ * - Generates a file name based on the user ID and current date.
+ * - Uploads the stringified expenses to an S3 bucket and retrieves the file URL.
+ * - Creates a new record in the UrlModel with the download URL and user ID.
+ * - Responds with a JSON object containing the file URL and success message.
+ */
 exports.downloadExpense = async (req, res, next) => {
   console.log(req.user);
   const userid = req.user.dataValues.id;
@@ -117,24 +129,10 @@ exports.downloadExpense = async (req, res, next) => {
 
   const fileName = `Expenses${userid}/${new Date()}.txt`;
   const fileURL = await uploadTos3(stringifiedExpenses, fileName);
-
-  // Check if there is an existing entry for the user in UrlModel
-  const existingEntry = await UrlModel.findOne({
-    where: { userId: userid },
+  await UrlModel.create({
+    downloadUrl: fileURL,
+    userId: userid,
   });
-
-  if (existingEntry) {
-    // If an entry exists, update the URL
-    await existingEntry.update({ url: fileURL });
-    console.log("Existing entry updated:", fileURL);
-  } else {
-    // If no entry exists, create a new one
-    await UrlModel.create({
-      url: fileURL,
-      userId: userid,
-    });
-    console.log("New entry created:", fileURL);
-  }
 
   res.status(201).json({ fileURL, success: true, messageL: "File Downloaded" });
 };

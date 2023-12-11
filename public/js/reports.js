@@ -1,8 +1,8 @@
+//DOM elements
 const dateInput = document.getElementById("date");
 const dateShowBtn = document.getElementById("dateShowBtn");
 const tbodyDaily = document.getElementById("tbodyDailyId");
 const tfootDaily = document.getElementById("tfootDailyId");
-
 const monthInput = document.getElementById("month");
 const monthShowBtn = document.getElementById("monthShowBtn");
 const tbodyMonthly = document.getElementById("tbodyMonthlyId");
@@ -105,7 +105,12 @@ async function getDailyReport(e) {
   - Handles errors by logging them to the console.
 
 */
+/*
+  Event Handler: getMonthlyReport
 
+  Description:
+  Initiates fetching and displaying of monthly expense reports.
+*/
 async function getMonthlyReport(e) {
   try {
     e.preventDefault();
@@ -176,6 +181,12 @@ async function getMonthlyReport(e) {
   }
 }
 
+/*
+  Event Handler: logout
+
+  Description:
+  Logs out the user by clearing the local storage and redirecting to the login page.
+*/
 async function logout() {
   try {
     localStorage.clear();
@@ -195,6 +206,8 @@ async function logout() {
  */
 const download = () => {
   const token = localStorage.getItem("token");
+
+  // Making a GET request to a server endpoint for file download
   axios
     .get("http://localhost:3000/reports/download", {
       headers: { Authorization: token },
@@ -202,6 +215,8 @@ const download = () => {
     .then((response) => {
       if (response.status === 201) {
         const fileURL = response.data.fileURL;
+
+        // Triggering download for the file named "myexpense.csv"
         const a = document.createElement("a");
         a.style.display = "none";
         document.body.appendChild(a);
@@ -218,6 +233,7 @@ const download = () => {
     });
 };
 
+//event listeners
 dateShowBtn.addEventListener("click", getDailyReport);
 monthShowBtn.addEventListener("click", getMonthlyReport);
 logoutBtn.addEventListener("click", logout);

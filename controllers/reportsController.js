@@ -1,5 +1,4 @@
 const path = require("path");
-
 const Expense = require("../models/expenseModel");
 const { Op } = require("sequelize");
 const AWS = require("aws-sdk");
@@ -13,6 +12,7 @@ const UrlModel = require("../models/urlModel");
   - Uses the 'res.sendFile' method to send the reports.html file as the response.
 */
 exports.getReportsPage = (req, res, next) => {
+  //sending reports.html as the response
   res.sendFile(path.join(rootDir, "views", "reports.html"));
 };
 
@@ -25,11 +25,11 @@ exports.getReportsPage = (req, res, next) => {
   - Uses Sequelize's 'Expense' model to query the database for expenses on the specified date.
   - Filters expenses based on both date and user ID.
   - Sends the fetched expenses as the HTTP response.
-
 */
 exports.dailyReports = async (req, res, next) => {
   try {
     const date = req.body.date;
+    //Query the database for the expenses on the specified data and for the authenticated user
     const expenses = await Expense.findAll({
       where: { date: date, userId: req.user.id },
     });
@@ -55,6 +55,7 @@ exports.dailyReports = async (req, res, next) => {
 exports.monthlyReports = async (req, res, next) => {
   try {
     const month = req.body.month;
+    // Query the database for expenses within the specified month and for the authenticated user
     const expenses = await Expense.findAll({
       where: {
         date: {
@@ -78,14 +79,18 @@ exports.monthlyReports = async (req, res, next) => {
  * - Logs success or error messages to the console.
  */
 function uploadTos3(data, filename) {
+  // Retrieving AWS credentials from environment variables
   const BUCKET_NAME = process.env.BUCKET_NAME;
   const IAM_USER_KEY = process.env.IAM_USER_KEY;
   const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
+
+  // Creating an S3 bucket instance
   let s3Bucket = new AWS.S3({
     accessKeyId: IAM_USER_KEY,
     secretAccessKey: IAM_USER_SECRET,
   });
 
+  // S3 upload parameters
   var params = {
     Bucket: BUCKET_NAME,
     Key: filename,
@@ -93,13 +98,12 @@ function uploadTos3(data, filename) {
     ACL: "public-read",
   };
 
+  // Returning a Promise for the S3 upload operation
   return new Promise((resolve, reject) => {
     s3Bucket.upload(params, (err, s3response) => {
       if (err) {
-        console.log("something went wrong", err);
         reject(err);
       } else {
-        console.log("success", s3response);
         resolve(s3response.Location);
       }
     });
@@ -117,22 +121,28 @@ function uploadTos3(data, filename) {
  * - Responds with a JSON object containing the file URL and success message.
  */
 exports.downloadExpense = async (req, res, next) => {
-  console.log(req.user);
   const userid = req.user.dataValues.id;
 
+  // Query the database for the user's expenses
   const expenses = await Expense.findAll({
     where: { userId: userid },
   });
 
+  // Stringify expenses array for upload
   const stringifiedExpenses = JSON.stringify(expenses);
-  console.log("The stringified expenses of the user is ", stringifiedExpenses);
 
+  // Generate a file name based on user ID and current date
   const fileName = `Expenses${userid}/${new Date()}.txt`;
+
+  // Upload stringified expenses to an S3 bucket and retrieve the file URL
   const fileURL = await uploadTos3(stringifiedExpenses, fileName);
+
+  // Create a new record in the UrlModel with the download URL and user ID
   await UrlModel.create({
     downloadUrl: fileURL,
     userId: userid,
   });
 
+  // Respond with a JSON object containing the file URL and success message
   res.status(201).json({ fileURL, success: true, messageL: "File Downloaded" });
 };

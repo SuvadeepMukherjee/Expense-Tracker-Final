@@ -5,6 +5,7 @@ const userController = require("../controllers/userController");
 const expenseController = require("../controllers/expenseController");
 const userAuthentication = require("../middleware/auth");
 
+router.get("/", userController.getSignUpPage);
 router.get("/signup", userController.getSignUpPage);
 router.get("/login", userController.getLoginPage);
 router.post("/signup", userController.postUserSignUp);

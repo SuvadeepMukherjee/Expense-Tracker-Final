@@ -10,6 +10,7 @@ const sequelize = require("../util/database");
   This function generates an access token using the provided user ID and email.
   - Utilizes the 'jsonwebtoken' library to sign a token containing the user's ID and email.
   - Returns the generated access token.
+  - we send this as a token during succesfull login (login function backend)
 */
 function generateAccessToken(id, email) {
   return jwt.sign({ userId: id, email: email }, process.env.TOKEN);
@@ -50,7 +51,7 @@ exports.getLoginPage = (req, res, next) => {
 };
 
 /*
-  Express route handler: Handles user sign-up requests.
+  Handles a POST request to the /users/signup endpoint
   - Extracts user information (name, email, and password) from the request body.
   - Checks if the provided email already exists in the database.
     - If the email exists, returns a 409 status with an error message.
@@ -76,7 +77,7 @@ exports.postUserSignUp = async (req, res, next) => {
       });
     }
 
-    //Hash the password using bcrypt and create a new user in the database
+    //Hash the password using bcrypt and create a new user in the database(saltrounds = 10 )
     bcrypt.hash(password, 10, async (err, hash) => {
       await User.create({
         name: name,
@@ -102,7 +103,7 @@ exports.postUserSignUp = async (req, res, next) => {
 };
 
 /*
-  Express route handler: Handles user login requests.
+  Handles a POST request to the users/login endpoint
   - Extracts user email and password from the request body.
   - Finds the user in the database based on the provided email.
   - Compares the provided password with the hashed password stored in the database.
@@ -113,6 +114,7 @@ exports.postUserSignUp = async (req, res, next) => {
 */
 exports.postUserLogin = async (req, res, next) => {
   try {
+    //Extarct user email and password
     const email = req.body.emailValue;
     const password = req.body.passwordValue;
 

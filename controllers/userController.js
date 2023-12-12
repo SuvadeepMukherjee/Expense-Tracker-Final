@@ -56,9 +56,12 @@ exports.getLoginPage = (req, res, next) => {
 */
 exports.postUserSignUp = async (req, res, next) => {
   try {
+    //extract data from the request body
     const name = req.body.nameValue;
     const email = req.body.emailValue;
     const password = req.body.passwordValue;
+
+    //Check if the user already exists
     const existingUser = await User.findOne({ where: { email: email } });
 
     if (existingUser) {
@@ -66,6 +69,8 @@ exports.postUserSignUp = async (req, res, next) => {
         error: "This email is already taken. Please choose another one.",
       });
     }
+
+    //Hash the password using bcrypt and create a new user in the database
     bcrypt.hash(password, 10, async (err, hash) => {
       await User.create({
         name: name,
@@ -73,12 +78,16 @@ exports.postUserSignUp = async (req, res, next) => {
         password: hash,
       });
     });
+
+    //Send a success response
     res.status(200).json({
       success: true,
       message: "Login Successful!",
     });
   } catch (err) {
     console.error(err);
+
+    //send an error response
     res.status(500).json({
       success: false,
       message: "Internal Server Error",

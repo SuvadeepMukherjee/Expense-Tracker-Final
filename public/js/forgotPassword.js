@@ -10,12 +10,13 @@ const resetPasswordLinkBtn = document.getElementById("resetPasswordLinkBtn");
   with the response message and redirects to the login page. In case of an error, it
   displays an alert with the error message and reloads the current window.
 */
-async function sendMail(e) {
+async function sendMail(event) {
   try {
-    e.preventDefault();
+    event.preventDefault();
 
     //Get the email value from the input field
-    const email = document.getElementById("email").value;
+    const emailInput = document.getElementById("email");
+    const email = emailInput.value;
 
     //Make a POST request to send the mail
     const res = await axios.post("http://localhost:3000/password/sendMail", {

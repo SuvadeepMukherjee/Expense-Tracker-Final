@@ -19,7 +19,10 @@ const hashPassword = async (password) => {
   Express route handler: Renders the forgot-password page.
 */
 exports.forgotPasswordPage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, "views", "forgotPassword.html"));
+  const filePath = path.join(rootDir, "views", "forgotPassword.html");
+
+  //Sending the forgot password page as response
+  res.sendFile(filePath);
 };
 
 /*

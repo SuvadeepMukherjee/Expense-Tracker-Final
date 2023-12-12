@@ -1,3 +1,4 @@
+//DOM element
 const resetPasswordLinkBtn = document.getElementById("resetPasswordLinkBtn");
 
 /*
@@ -12,14 +13,22 @@ const resetPasswordLinkBtn = document.getElementById("resetPasswordLinkBtn");
 async function sendMail(e) {
   try {
     e.preventDefault();
+
+    //Get the email value from the input field
     const email = document.getElementById("email").value;
+
+    //Make a POST request to send the mail
     const res = await axios.post("http://localhost:3000/password/sendMail", {
       email: email,
     });
+
+    //Display a success message
     alert(res.data.message);
+
+    //Redirect to the login page
     window.location.href = "/user/login";
   } catch (error) {
-    console.log(error.response.status);
+    //display the error
     alert(error.response.data.message);
     window.location.reload();
   }

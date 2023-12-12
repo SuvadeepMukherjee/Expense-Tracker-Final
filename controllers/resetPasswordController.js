@@ -29,7 +29,10 @@ exports.forgotPasswordPage = (req, res, next) => {
   Express route handler: Renders the reset-password page.
 */
 exports.resetPasswordPage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, "views", "resetPassword.html"));
+  const filePath = path.join(rootDir, "views", "resetPassword.html");
+
+  //sending the resetPassword page as response
+  res.sendFile(filePath);
 };
 
 /*
@@ -48,32 +51,41 @@ exports.resetPasswordPage = (req, res, next) => {
 */
 exports.sendMail = async (req, res, next) => {
   try {
+    //Extract email from the request body
     const email = req.body.email;
+
+    //Generate a unique requestId using uuid
     const requestId = uuidv4();
 
+    //Find the user by email in the database
     const recepientEmail = await User.findOne({ where: { email: email } });
-    console.log("receipient email is ", recepientEmail);
-    const userId = recepientEmail.dataValues.id;
-    console.log(userId);
 
+    //Extract the id from the retreived user data(database)
+    const userId = recepientEmail.dataValues.id;
+
+    //Check if the user exists
     if (!recepientEmail) {
       return res
         .status(404)
         .json({ message: "Please provide the registered email!" });
     }
 
+    //Create a new Reset request in the ResetPassword table(userId is foreign key)
     const resetRequest = await ResetPassword.create({
       id: requestId,
       isActive: true,
       userId: userId,
     });
 
+    //Set up Sendinblue API client
     const client = Sib.ApiClient.instance;
     const apiKey = client.authentications["api-key"];
     apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
 
+    //Set up TransactionalEmailsApi
     const transEmailApi = new Sib.TransactionalEmailsApi();
 
+    //define sender and receiver information
     const sender = {
       email: "suvadeepworks@gmail.com",
       name: "Suvadeep",
@@ -84,6 +96,7 @@ exports.sendMail = async (req, res, next) => {
       },
     ];
 
+    //Send a transactional email using Sendinblue
     const emailResponse = await transEmailApi.sendTransacEmail({
       sender,
       To: receivers,
@@ -95,11 +108,14 @@ exports.sendMail = async (req, res, next) => {
         requestId: requestId,
       },
     });
+
+    //Return a  success rsponse
     return res.status(200).json({
       message:
         "Link for reset the password is successfully send on your Mail Id!",
     });
   } catch (err) {
+    //return an error response if any issues occur during the response
     return res.status(409).json({ message: "failed changing password" });
   }
 };
@@ -108,7 +124,7 @@ exports.sendMail = async (req, res, next) => {
   
   Handles a POST request to the "/password/resetPassword" endpoint.
 
-  - Extracts the request ID from the referer header.
+  - Extracts the request ID from the referer header.(which we send during sendMail)
   - Extracts the new password from the request body.
   - Checks if the reset request associated with the ID is active.
   - If active, updates the reset request status to inactive.
@@ -119,25 +135,37 @@ exports.sendMail = async (req, res, next) => {
 */
 exports.updatePassword = async (req, res, next) => {
   try {
+    //Extract the requestId from the referer header
     const requestId = req.headers.referer.split("/");
 
+    //Extract the new password from the request body
     const password = req.body.password;
 
+    //Check for an active reset request with the given requestId
     const checkResetRequest = await ResetPassword.findAll({
       where: { id: requestId[requestId.length - 1], isActive: true },
     });
 
+    //if an active reset request is found
     if (checkResetRequest[0]) {
+      //Extract userId from the reset request
       const userId = checkResetRequest[0].dataValues;
+
+      //Deactivate the reset request
       const result = ResetPassword.update(
         { isActive: false },
         { where: { id: requestId } }
       );
+
+      //Hash the new password
       const newPassword = await hashPassword(password);
+
+      //update the users password with the new hashed password
       const user = await User.update(
         { password: newPassword },
         { where: { id: userId.userId } }
       );
+
       return res.status(200).json({ message: "Succesfully changed password" });
     } else {
       res.status(409).json({ message: "Failed to change password!" });

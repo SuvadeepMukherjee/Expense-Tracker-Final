@@ -1,4 +1,6 @@
 const express = require("express");
+//creates a modular, mountable set of routes for an Express.js application.
+// It allows you to organize routes and their handlers in a separate file
 const router = express.Router();
 
 const reportsController = require("../controllers/reportsController");

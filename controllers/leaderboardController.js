@@ -10,7 +10,10 @@ const sequelize = require("../util/database");
  * - Uses the path module to construct the file path for the leaderboard.html file.
  */
 exports.getLeaderboardPage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, "views", "leaderboard.html"));
+  const filePath = path.join(rootDir, "views", "leaderboard.html");
+
+  //Sending the leaderboard page as response
+  res.sendFile(filePath);
 };
 
 /**

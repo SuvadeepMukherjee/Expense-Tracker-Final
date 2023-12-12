@@ -1,6 +1,4 @@
-/*
-Create a connection pool
-*/
+//Create a connection pool
 
 const Sequelize = require("sequelize");
 

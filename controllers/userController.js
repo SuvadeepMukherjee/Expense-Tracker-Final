@@ -13,7 +13,7 @@ const sequelize = require("../util/database");
   - we send this as a token during succesfull login (login function backend)
 */
 function generateAccessToken(id, email) {
-  return jwt.sign({ userId: id, email: email }, process.env.TOKEN);
+  return jwt.sign({ userId: id, email: email }, process.env.JWT_SECRET);
 }
 
 /**

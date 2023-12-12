@@ -9,7 +9,10 @@ const rootDir = require("../util/path");
 const User = require("../models/userModel");
 const ResetPassword = require("../models/resetPasswordModel");
 
-// Hashes a password using bcrypt with a specified number of salt rounds.
+/*
+ Utility function which we use during updatePassword
+ Hashes a password using bcrypt with a specified number of salt rounds.
+*/
 const saltRounds = 10;
 const hashPassword = async (password) => {
   return await bcrypt.hash(password, saltRounds);

@@ -33,14 +33,20 @@ exports.isPremiumUser = async (req, res, next) => {
   Express route handler: Renders the sign-up page.
 */
 exports.getSignUpPage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, "views", "sign-up.html"));
+  const filePath = path.join(rootDir, "views", "sign-up.html");
+
+  //Sending the sign-up page as response
+  res.sendFile(filePath);
 };
 
 /*
   Express route handler: Renders the login page.
 */
 exports.getLoginPage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, "views", "login.html"));
+  const filePath = path.join(rootDir, "views", "login.html");
+
+  //Sending the login page as response
+  res.sendFile(filePath);
 };
 
 /*

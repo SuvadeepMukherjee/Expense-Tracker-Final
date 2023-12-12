@@ -12,12 +12,15 @@ const UrlModel = require("../models/urlModel");
   - Uses the 'res.sendFile' method to send the reports.html file as the response.
 */
 exports.getReportsPage = (req, res, next) => {
-  //sending reports.html as the response
-  res.sendFile(path.join(rootDir, "views", "reports.html"));
+  const filePath = path.join(rootDir, "views", "reports.html");
+
+  //Sending the reports.html page as response
+  res.sendFile(filePath);
 };
 
 /*
   Controller Function: dailyReports
+  Handles a POST request to the reports/dailyReports Endpoint 
 
   Description:
   This asynchronous function handles requests for daily expense reports.
@@ -41,6 +44,7 @@ exports.dailyReports = async (req, res, next) => {
 
 /*
   Controller Function: monthlyReports
+  Handles a POST request to the reports/monthlyReports Endpoint
 
   Description:
   This asynchronous function handles requests for monthly expense reports.
@@ -112,7 +116,7 @@ function uploadTos3(data, filename) {
 
 /**
  * downloadExpense Controller
- * - Logs the authenticated user information to the console.
+ * - Handles a GET request to the reports/download Endpoint
  * - Retrieves the user ID from the request and queries the database for the user's expenses.
  * - Stringifies the expenses array and logs it to the console.
  * - Generates a file name based on the user ID and current date.

@@ -1,3 +1,4 @@
+//DOM elements
 const email = document.querySelector("#email");
 const password = document.querySelector("#password");
 const backendResponse = document.querySelector("#backend-response");
@@ -47,4 +48,5 @@ async function loginUser(e) {
   }
 }
 
+//event listeners
 document.getElementById("form").addEventListener("submit", loginUser);

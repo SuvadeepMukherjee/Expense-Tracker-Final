@@ -20,6 +20,9 @@ router.get(
   userAuthentication,
   expenseController.getAllExpensesforPagination
 );
+
+//Including :id in the route path allows these routes to capture the  ID from the URL.
+//This ID is then used to identify the specific expense to be deleted or edited.
 router.get(
   "/deleteExpense/:id",
   userAuthentication,

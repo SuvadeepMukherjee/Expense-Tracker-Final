@@ -392,6 +392,7 @@ async function editExpense(e) {
         "http://localhost:3000/expense/getAllExpenses",
         { headers: { Authorization: token } }
       );
+
       res.data.forEach((expense) => {
         if (expense.id == id) {
           categoryValue.textContent = expense.category;

@@ -15,6 +15,8 @@ exports.getHomePage = (req, res, next) => {
 
 /**
  * addExpense controller
+ * - Handles a POST request on /expense/addExpense
+ * - We are sending a POST request from homepage.js
  * - Initiates a database transaction using Sequelize.
  * - Extracts date, category, description, and amount from the request body.
  * - Updates the totalExpenses of the authenticated user in the database.
@@ -66,6 +68,7 @@ exports.addExpense = async (req, res, next) => {
 
 /**
  * getAllExpenses controller
+ * - We are calling this controller during editing expenses(getting all expenses)
  * - Retrieves all expenses associated with the authenticated user.
  * - Uses Sequelize to query the database and fetch expenses based on the user ID.
  * - Responds with a JSON array containing the retrieved expenses.
@@ -187,11 +190,3 @@ exports.getAllExpensesforPagination = async (req, res, next) => {
     console.log(err);
   }
 };
-
-/**
- * uploadToS3 Utility Function
- * - Uploads the provided data to an Amazon S3 bucket.
- * - Requires the BUCKET_NAME, IAM_USER_KEY, and IAM_USER_SECRET to be set as environment variables.
- * - Returns a Promise that resolves with the S3 bucket location of the uploaded file.
- * - Logs success or error messages to the console.
- */

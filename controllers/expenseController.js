@@ -3,7 +3,6 @@ const path = require("path");
 const rootDir = require("../util/path");
 const Expense = require("../models/expenseModel");
 const User = require("../models/userModel");
-const UrlModel = require("../models/urlModel");
 const sequelize = require("../util/database");
 
 /*
@@ -16,9 +15,9 @@ exports.getHomePage = (req, res, next) => {
 /**
  * addExpense controller
  * - Handles a POST request on /expense/addExpense
- * - We are sending a POST request from homepage.js
+ * - From the client we are sending date,category,description,amount
+ * - This middleware passes through the auth.js middleware
  * - Initiates a database transaction using Sequelize.
- * - Extracts date, category, description, and amount from the request body.
  * - Updates the totalExpenses of the authenticated user in the database.
  * - Creates a new Expense record in the database with the provided details.
  * - Commits the transaction and responds with a 200 status, redirecting to the "/homePage".
@@ -71,11 +70,13 @@ exports.addExpense = async (req, res, next) => {
  * - We are calling this controller during editing expenses(getting all expenses)
  * - Retrieves all expenses associated with the authenticated user.
  * - Uses Sequelize to query the database and fetch expenses based on the user ID.
+ * - Convert the raw data to json and send it back to the client
  * - Responds with a JSON array containing the retrieved expenses.
  */
 exports.getAllExpenses = async (req, res, next) => {
   try {
     const expenses = await Expense.findAll({ where: { userId: req.user.id } });
+    //send the responses as json
     res.json(expenses);
   } catch (err) {
     console.log(err);
@@ -84,11 +85,13 @@ exports.getAllExpenses = async (req, res, next) => {
 
 /**
  * deleteExpense controller
+ * - Handles The GET request for the endpoint expense/deleteExpense/${id}
+ * - Including :id in the route path allows these routes to capture the  ID from the URL.
+ * - This ID is then used to identify the specific expense to be deleted
  * - Extracts expense ID from the request parameters.
  * - Retrieves the existing expense using the ID.
- * - Updates the totalExpenses of the authenticated user by subtracting the expense amount.
+ * - Updates the totalExpenses of the authenticated user
  * - Deletes the expense record from the database.
- * - Redirects to the "/homePage" after successful deletion.
  */
 exports.deleteExpense = async (req, res, next) => {
   const id = req.params.id;
@@ -108,12 +111,16 @@ exports.deleteExpense = async (req, res, next) => {
 };
 
 /**
- * editExpense controller
+ * - Handles the endpoint expense/editExpense/${id}
+ * - Including :id in the route path allows these routes to capture the expense ID from the URL.
+ * - This ID is then used to identify the specific expense to be deleted or edited.
+ * - This middleware is only reached after passing thorough the auth middleware
+ * - from the client we are sending category,description,amount
  * - Extracts expense ID, category, description, and amount from the request parameters and body.
  * - Retrieves the existing expense using the ID.
  * - Updates the totalExpenses of the authenticated user by adjusting for the changes in the expense amount.
  * - Updates the expense details in the database.
- * - Redirects to the "/homePage" after successful update.
+ *
  */
 exports.editExpense = async (req, res, next) => {
   try {
@@ -121,16 +128,16 @@ exports.editExpense = async (req, res, next) => {
     const category = req.body.category;
     const description = req.body.description;
     const amount = req.body.amount;
-
+    //retreives the expense from the table by id
     const expense = await Expense.findByPk(id);
-
+    //updates totalExpenses in user table
     await User.update(
       {
         totalExpenses: req.user.totalExpenses - expense.amount + Number(amount),
       },
       { where: { id: req.user.id } }
     );
-
+    //updates the expense in the expense table
     await Expense.update(
       {
         category: category,
@@ -148,17 +155,15 @@ exports.editExpense = async (req, res, next) => {
 
 /**
  * getAllExpensesforPagination Controller
+ * - Handles the GET request on the endpoint expense/getAllExpenses/${pageNo}
+ * - This end point first goes to the auth.js middleware
+ * - an offset is a parameter used to specify the starting point from which a set of data should be retrieved
  * - Retrieves the page number from the request parameters.
  * - Sets the limit and offset for pagination based on the page number.
  * - Counts the total number of expenses for the authenticated user.
  * - Calculates the total number of pages based on the limit and total expenses.
  * - Queries the database for expenses based on the calculated offset and limit.
  * - Responds with a JSON object containing the fetched expenses and total number of pages.
- *
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {function} next - The next middleware function.
- * @returns {Promise<void>} - A Promise that resolves after handling the getAllExpensesforPagination operation.
  */
 exports.getAllExpensesforPagination = async (req, res, next) => {
   try {
@@ -166,7 +171,8 @@ exports.getAllExpensesforPagination = async (req, res, next) => {
     const pageNo = req.params.page;
 
     // Set the limit and offset for pagination based on the page number
-    const limit = 10;
+    //an offset is a parameter used to specify the starting point from which a set of data should be retrieved
+    const limit = 3;
     const offset = (pageNo - 1) * limit;
 
     // Count the total number of expenses for the authenticated user

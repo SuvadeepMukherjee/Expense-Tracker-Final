@@ -33,7 +33,7 @@ categoryItems.forEach((item) => {
  * - Generates and appends pagination links based on the total number of pages.
  * - Adds click event listeners to the pagination links for handling page navigation.
  *
- * @returns {Promise<void>} - A Promise that resolves after handling the getAllExpenses operation.
+ *
  */
 async function getAllExpenses() {
   try {
@@ -99,15 +99,31 @@ async function getAllExpenses() {
     });
 
     // Generate and append pagination links based on the total number of pages
+    // Get the reference to the unordered list element with the id "paginationUL"
     const ul = document.getElementById("paginationUL");
+
+    // Loop through each page from 1 to the total number of pages received from the server response
     for (let i = 1; i <= res.data.totalPages; i++) {
+      // Create a list item element for each pagination link
       const li = document.createElement("li");
+
+      // Create an anchor element to serve as the pagination link
       const a = document.createElement("a");
+
+      // Set Bootstrap classes for styling the pagination list item and link
       li.setAttribute("class", "page-item");
       a.setAttribute("class", "page-link");
+
+      // Set the "href" attribute for the anchor element (it's set to "#" here, but it can be updated with the actual page link)
       a.setAttribute("href", "#");
+
+      // Append the page number as a text node to the anchor element
       a.appendChild(document.createTextNode(i));
+
+      // Append the anchor element to the list item
       li.appendChild(a);
+
+      // Append the list item to the unordered list
       ul.appendChild(li);
 
       // Add click event listeners to the pagination links for handling page navigation
@@ -126,9 +142,6 @@ async function getAllExpenses() {
  * - Clears the content of the HTML table.
  * - Populates the table with the fetched expenses, including ID, date, category, description, amount.
  * - Creates Delete and Edit buttons for each expense and adds event listeners to them.
- *
- * @param {Event} e - The click event object from the pagination button.
- * @returns {Promise<void>} - A Promise that resolves after handling the paginationBtn operation.
  */
 async function paginationBtn(e) {
   try {
@@ -379,33 +392,41 @@ async function deleteExpense(e) {
  */
 async function editExpense(e) {
   try {
+    //extract the token which we send during login
     const token = localStorage.getItem("token");
+
     const categoryValue = document.getElementById("categoryBtn");
     const descriptionValue = document.getElementById("descriptionValue");
     const amountValue = document.getElementById("amountValue");
     const addExpenseBtn = document.getElementById("submitBtn");
+
+    //if clicked element contains edit btn extract the id of the clicked element
+    //make a get request to expense/getAllExpenses end point
     if (e.target.classList.contains("edit")) {
       let tr = e.target.parentElement.parentElement;
       let id = tr.children[0].textContent;
-      //Fill the input values with the existing values
+
       const res = await axios.get(
         "http://localhost:3000/expense/getAllExpenses",
         { headers: { Authorization: token } }
       );
 
+      //loops through the array
       res.data.forEach((expense) => {
+        //if expense.id ==clicked element id
         if (expense.id == id) {
+          //Fills the input values with the existing values of the selected expense.
           categoryValue.textContent = expense.category;
           descriptionValue.value = expense.description;
           amountValue.value = expense.amount;
           addExpenseBtn.textContent = "Update";
-
-          // const form = document.getElementById("form1");
+          //remove event listener add
           addExpenseBtn.removeEventListener("click", addExpense);
-
+          //add an event listener for click
           addExpenseBtn.addEventListener("click", async function update(e) {
             e.preventDefault();
             console.log("request to backend for edit");
+            //make a post request to expense/editExpense/${id}
             const res = await axios.post(
               `http://localhost:3000/expense/editExpense/${id}`,
               {

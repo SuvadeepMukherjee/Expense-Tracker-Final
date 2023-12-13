@@ -61,8 +61,7 @@ app.use("/reports", reportsRouter);
 // linking each expense to a specific user
 // Both associations are needed for a bidirectional relationship,
 // allowing navigation from User to Expense and vice versa.
-// these associations are necessary to represent the connections and dependencies between the entities in the
-// database , reflecting real-world relationships between users,expenses,orders, resetPasswords and URL downloads
+// Establishing bidirectional relationships for data integrity and query convenience
 User.hasMany(Expense);
 Expense.belongsTo(User);
 User.hasMany(Order);

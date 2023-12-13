@@ -4,7 +4,8 @@ const User = require("../models/userModel");
 
 /**
  * purchasePremium controller
- * -Handles the endpoint /purchase/premiumMembership
+ * - Handles the endpoint /purchase/premiumMembership(GET request)
+ * - before reaching this controller it goes to auth.js
  * - Initializes a new instance of Razorpay with the provided key ID and key secret.
  * - Sets the amount for the premium membership purchase.
  * - Creates a Razorpay order(rzp.orders.create()) with the specified amount
@@ -39,7 +40,8 @@ exports.purchasePremium = async (req, res) => {
 
 /**
  * updateTransactionStatus controller
- * - Handles the endpoint /purchase/updateTransactionStatus  
+ * - Handles the endpoint /purchase/updateTransactionStatus(POST request )
+ * - Before reaching this controller it goes to auth.js
  * - Retrieves payment and order information from the request body.
  * - Finds the corresponding order in the database using the provided order ID.
  * - Updates the order status to "SUCCESSFUL" and associates the payment ID.

@@ -26,7 +26,7 @@ const authenticateMiddleware = async (req, res, next) => {
     // Verify and decode the JWT
     const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Retrieve user from the database based on the decoded user ID
+    // Retrieve user from the database based on the decoded userID(token has a property of userId)
     const userFromDB = await User.findByPk(decodedUser.userId);
 
     // Attach the user to the request

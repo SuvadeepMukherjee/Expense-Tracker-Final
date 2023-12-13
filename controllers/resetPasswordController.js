@@ -1,5 +1,6 @@
 const path = require("path");
 
+// Import the v4 function from the uuid library and save it in uuidv4
 const { v4: uuidv4 } = require("uuid");
 const Sib = require("sib-api-v3-sdk");
 const bcrypt = require("bcrypt");
@@ -12,6 +13,7 @@ const ResetPassword = require("../models/resetPasswordModel");
 /*
  Utility function which we use during updatePassword
  Hashes a password using bcrypt with a specified number of salt rounds.
+ saltrounds=>cost factor for the hashing algorithm
 */
 const saltRounds = 10;
 const hashPassword = async (password) => {
@@ -146,6 +148,7 @@ exports.updatePassword = async (req, res, next) => {
 
     //Check for an active reset request with the given requestId
     const checkResetRequest = await ResetPassword.findAll({
+      //querry the database for the id(uuid) and isActive:true
       where: { id: requestId[requestId.length - 1], isActive: true },
     });
 

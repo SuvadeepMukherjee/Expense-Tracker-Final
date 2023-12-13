@@ -77,6 +77,7 @@ exports.postUserSignUp = async (req, res, next) => {
     }
 
     //Hash the password using bcrypt and create a new user in the database(saltrounds = 10 )
+    //saltrounds=> cost factor of the hashing algorithm
     bcrypt.hash(password, 10, async (err, hash) => {
       await User.create({
         name: name,

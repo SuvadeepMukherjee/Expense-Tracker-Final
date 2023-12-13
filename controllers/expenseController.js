@@ -1,5 +1,6 @@
 const path = require("path");
 
+//directory name of the main modules filename(app.js)
 const rootDir = require("../util/path");
 const Expense = require("../models/expenseModel");
 const User = require("../models/userModel");
@@ -67,7 +68,9 @@ exports.addExpense = async (req, res, next) => {
 
 /**
  * getAllExpenses controller
+ * - Handles the GET request on the endpoint expense/getAllExpenses
  * - We are calling this controller during editing expenses(getting all expenses)
+ * - This controller goes through the auth.js middleware before reaching here
  * - Retrieves all expenses associated with the authenticated user.
  * - Uses Sequelize to query the database and fetch expenses based on the user ID.
  * - Convert the raw data to json and send it back to the client
@@ -89,6 +92,7 @@ exports.getAllExpenses = async (req, res, next) => {
  * - Including :id in the route path allows these routes to capture the  ID from the URL.
  * - This ID is then used to identify the specific expense to be deleted
  * - Extracts expense ID from the request parameters.
+ * - Before reaching this middleware it reaches the auth.js middleware
  * - Retrieves the existing expense using the ID.
  * - Updates the totalExpenses of the authenticated user
  * - Deletes the expense record from the database.

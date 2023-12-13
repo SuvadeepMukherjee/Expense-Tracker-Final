@@ -1,15 +1,17 @@
 const Razorpay = require("razorpay");
 const Order = require("../models/ordersModel");
 const User = require("../models/userModel");
-const userController = require("./userController");
 
 /**
  * purchasePremium controller
+ * -Handles the endpoint /purchase/premiumMembership
  * - Initializes a new instance of Razorpay with the provided key ID and key secret.
  * - Sets the amount for the premium membership purchase.
- * - Creates a Razorpay order with the specified amount and currency (INR).
- * - Generates a new order record in the database with the status set to "PENDING" and associates it with the requesting user.
- * - Responds to the client with the created order details and the Razorpay key ID.
+ * - Creates a Razorpay order(rzp.orders.create()) with the specified amount
+ * -It takes an asynchronous function as a callback
+ *  - The callback awaits  Generating a new order record in the database with the status set to "PENDING" and
+ *  - associates it with the user.
+ *  - Responds to the client with the created order details and the Razorpay key ID. after the order created in db
  */
 exports.purchasePremium = async (req, res) => {
   try {
@@ -18,13 +20,15 @@ exports.purchasePremium = async (req, res) => {
       key_secret: process.env.RZP_KEY_SECRET,
     });
     const amount = 1000;
+    // Initiates Razorpay order creation. Callback function handles order details.
     rzp.orders.create({ amount, currency: "INR" }, async (err, order) => {
+      // Creates a new order record in the database using 'Order.create'.
       const createdOrder = await Order.create({
         orderid: order.id,
         status: "PENDING",
         userId: req.user.id,
       });
-
+      // Responds to the client with created order and Razorpay key ID.
       return res.status(201).json({ order: createdOrder, key_id: rzp.key_id });
     });
   } catch (err) {
@@ -35,6 +39,7 @@ exports.purchasePremium = async (req, res) => {
 
 /**
  * updateTransactionStatus controller
+ * - Handles the endpoint /purchase/updateTransactionStatus  
  * - Retrieves payment and order information from the request body.
  * - Finds the corresponding order in the database using the provided order ID.
  * - Updates the order status to "SUCCESSFUL" and associates the payment ID.
@@ -44,8 +49,6 @@ exports.purchasePremium = async (req, res) => {
 
 exports.updateTransactionStatus = async (req, res) => {
   try {
-    console.log("inside upadate transaction status");
-    console.log("body of req.body", req.body);
     const payment_id = req.body.payment_id;
     const order_id = req.body.order_id;
     const order = await Order.findOne({ where: { orderid: order_id } });

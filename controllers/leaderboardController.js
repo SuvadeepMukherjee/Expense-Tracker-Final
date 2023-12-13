@@ -1,7 +1,9 @@
 const path = require("path");
 
+//directory name of main modules file name(app.js)
 const rootDir = require("../util/path");
 const User = require("../models/userModel");
+//creates a connection to the database
 const sequelize = require("../util/database");
 
 /**
@@ -25,9 +27,13 @@ exports.getLeaderboardPage = (req, res, next) => {
  *   - Selects specific attributes (name, totalExpenses) from the database.
  *   - Orders the results based on total expenses in descending order.
  * - Maps the retrieved user data into a more concise format.
- * - Sends a JSON response to the client containing the formatted user data.
+ * - Mapping the retreived user data is crucial for simplifying client-side logic
+ * - Sends a JSON (array of objects)response to the client containing the formatted user data.\
+ * - sequelize's findAll is inherently asynchronous, our code handles it using a Promise-based approach
+ * - with a .then() block, making the overall code asynchronous.
+ *
  */
-exports.getAllUsers = async (req, res, next) => {
+exports.getAllUsers = (req, res, next) => {
   try {
     // Use Sequelize to query the database for all users
     User.findAll({
@@ -46,7 +52,7 @@ exports.getAllUsers = async (req, res, next) => {
       }));
 
       // Send a JSON response containing the formatted user data
-      res.send(JSON.stringify(result));
+      res.send(result);
     });
   } catch (error) {
     // Log any errors that occur during the process

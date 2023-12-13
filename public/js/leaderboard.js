@@ -32,6 +32,10 @@ categoryItems.forEach((item) => {
 
 async function getLeaderboard() {
   const res = await axios.get("http://localhost:3000/premium/getAllUsers");
+  console.log(res);
+  //position is used to generate an ordered list of users
+  // with their respective positions, enhancing the visual
+  //representation of the leaderboard on the client side.
   let position = 1;
   console.log(res.data);
   res.data.forEach((user) => {

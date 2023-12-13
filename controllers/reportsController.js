@@ -1,5 +1,6 @@
 const path = require("path");
 const Expense = require("../models/expenseModel");
+//provides a set of standard operators that can be used in queries to perform complex conditions.
 const { Op } = require("sequelize");
 const AWS = require("aws-sdk");
 const rootDir = require("../util/path");
@@ -27,7 +28,7 @@ exports.getReportsPage = (req, res, next) => {
   - Retrieves the selected date from the request body.
   - Uses Sequelize's 'Expense' model to query the database for expenses on the specified date.
   - Filters expenses based on both date and user ID.
-  - Sends the fetched expenses as the HTTP response.
+  - Sends the fetched expenses(JSON) as the HTTP response.
 */
 exports.dailyReports = async (req, res, next) => {
   try {
@@ -55,6 +56,7 @@ exports.dailyReports = async (req, res, next) => {
   - The 'raw: true' option in Sequelize's findAll() method instructs the query to return raw database records as plain JavaScript objects instead of Sequelize model instances. 
   Notes:
   - Utilizes Sequelize's [Op.like] operator to filter expenses by the specified month.
+  -The response is send as a JSON and if no response is found it sends an empty array 
 */
 exports.monthlyReports = async (req, res, next) => {
   try {
@@ -78,9 +80,12 @@ exports.monthlyReports = async (req, res, next) => {
 /**
  * uploadToS3 Utility Function
  * - Uploads the provided data to an Amazon S3 bucket.
- * - Requires the BUCKET_NAME, IAM_USER_KEY, and IAM_USER_SECRET to be set as environment variables.
+ * - data is the content to be uploaded and filename is the name
+ * - s3Bucket instance created using AWS credentials
+ * - object params created to specify the parameters for the s3 upload operation
  * - Returns a Promise that resolves with the S3 bucket location of the uploaded file.
- * - Logs success or error messages to the console.
+ * - Rejected with an error object if upload operation fails
+ * - Returns a promise to handle the asynchronous nature of upload
  */
 function uploadTos3(data, filename) {
   // Retrieving AWS credentials from environment variables
@@ -99,6 +104,7 @@ function uploadTos3(data, filename) {
     Bucket: BUCKET_NAME,
     Key: filename,
     Body: data,
+    //uploaded object should be publicly readable
     ACL: "public-read",
   };
 

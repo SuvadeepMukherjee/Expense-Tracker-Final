@@ -113,7 +113,7 @@ exports.postUserSignUp = async (req, res, next) => {
 */
 exports.postUserLogin = async (req, res, next) => {
   try {
-    //Extarct user email and password
+    //Extract user email and password
     const email = req.body.emailValue;
     const password = req.body.passwordValue;
 

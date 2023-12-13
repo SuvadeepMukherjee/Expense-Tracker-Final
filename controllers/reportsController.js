@@ -24,11 +24,13 @@ exports.getReportsPage = (req, res, next) => {
   Handles a POST request to the reports/dailyReports Endpoint 
 
   Description:
-  This asynchronous function handles requests for daily expense reports.
+  This asynchronous function handles POST requests for daily expense reports.
+  - We are sending the date from the frontend 
   - Retrieves the selected date from the request body.
   - Uses Sequelize's 'Expense' model to query the database for expenses on the specified date.
   - Filters expenses based on both date and user ID.
-  - Sends the fetched expenses(JSON) as the HTTP response.
+  - we are sending the raw data back to the client(javascript object)
+  - In the client we extract the data 
 */
 exports.dailyReports = async (req, res, next) => {
   try {
@@ -37,6 +39,7 @@ exports.dailyReports = async (req, res, next) => {
     const expenses = await Expense.findAll({
       where: { date: date, userId: req.user.id },
     });
+
     return res.send(expenses);
   } catch (error) {
     console.log(error);
@@ -52,11 +55,10 @@ exports.dailyReports = async (req, res, next) => {
   - Retrieves the selected month from the request body.
   - Uses Sequelize's 'Expense' model to query the database for expenses within the specified month.
   - Filters expenses based on both date (using Sequelize's [Op.like] operator) and user ID.
-  - Sends the fetched expenses as the HTTP response.
-  - The 'raw: true' option in Sequelize's findAll() method instructs the query to return raw database records as plain JavaScript objects instead of Sequelize model instances. 
+  - Sends the fetched expenses as the HTTP response.(raw data , javascript object)
+
   Notes:
   - Utilizes Sequelize's [Op.like] operator to filter expenses by the specified month.
-  -The response is send as a JSON and if no response is found it sends an empty array 
 */
 exports.monthlyReports = async (req, res, next) => {
   try {
@@ -69,7 +71,6 @@ exports.monthlyReports = async (req, res, next) => {
         },
         userId: req.user.id,
       },
-      raw: true,
     });
     return res.send(expenses);
   } catch (error) {
@@ -83,7 +84,8 @@ exports.monthlyReports = async (req, res, next) => {
  * - data is the content to be uploaded and filename is the name
  * - s3Bucket instance created using AWS credentials
  * - object params created to specify the parameters for the s3 upload operation
- * - Returns a Promise that resolves with the S3 bucket location of the uploaded file.
+ * - Returns a Promise that resolves with the S3 bucket location(location of downloaded file)
+ *  of the uploaded file.
  * - Rejected with an error object if upload operation fails
  * - Returns a promise to handle the asynchronous nature of upload
  */
@@ -93,7 +95,7 @@ function uploadTos3(data, filename) {
   const IAM_USER_KEY = process.env.IAM_USER_KEY;
   const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
 
-  // Creating an S3 bucket instance
+  // Creating an S3 bucket instance(internal working of AWS SDK)
   let s3Bucket = new AWS.S3({
     accessKeyId: IAM_USER_KEY,
     secretAccessKey: IAM_USER_SECRET,

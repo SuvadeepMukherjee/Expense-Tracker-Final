@@ -11,9 +11,7 @@ const logoutBtn = document.getElementById("logoutBtn");
  * - Retrieves the selected category value from the clicked item's "data-value" attribute.
  * - Updates the text content of the categoryBtn with the selected category name.
  * - Sets the value of the categoryInput hidden field to the selected category.
- *
- * @param {Event} e - The click event triggered by clicking a category item.
- */
+ **/
 categoryItems.forEach((item) => {
   item.addEventListener("click", (e) => {
     const selectedCategory = e.target.getAttribute("data-value");
@@ -32,12 +30,8 @@ categoryItems.forEach((item) => {
 
 async function getLeaderboard() {
   const res = await axios.get("http://localhost:3000/premium/getAllUsers");
-  console.log(res);
-  //position is used to generate an ordered list of users
-  // with their respective positions, enhancing the visual
-  //representation of the leaderboard on the client side.
   let position = 1;
-  console.log(res.data);
+
   res.data.forEach((user) => {
     let name = user.name;
     let amount = user.totalExpenses;
@@ -65,7 +59,7 @@ async function getLeaderboard() {
 
 /**
  * logout function
- * - Attempts to clear the localStorage to remove user data.
+ * - clears the localStorage to remove user data.
  * - Redirects the user to the login page.
  */
 async function logout() {

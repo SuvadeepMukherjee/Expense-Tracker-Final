@@ -5,6 +5,7 @@ const rootDir = require("../util/path");
 const User = require("../models/userModel");
 //creates a connection to the database
 const sequelize = require("../util/database");
+const { log } = require("console");
 
 /**
  * getLeaderboardPage controller
@@ -20,42 +21,60 @@ exports.getLeaderboardPage = (req, res, next) => {
 
 /**
  * getAllUsers controller
- * -handles a GET request to the users/getAllUsers Endpoint
- * - we make a GET request to this controller from the leaderboardPage
- * - Retrieves all users from the database, including their names and total expenses.
+ * - Handles a GET request to the users/getAllUsers Endpoint.
+ * - We make a GET request to this controller from the leaderboardPage.
  * - Utilizes Sequelize to perform a query on the User model.
  *   - Selects specific attributes (name, totalExpenses) from the database.
  *   - Orders the results based on total expenses in descending order.
  * - Maps the retrieved user data into a more concise format.
- * - Mapping the retreived user data is crucial for simplifying client-side logic
- * - Sends a JSON (array of objects)response to the client containing the formatted user data.\
- * - sequelize's findAll is inherently asynchronous, our code handles it using a Promise-based approach
- * - with a .then() block, making the overall code asynchronous.
+ * - Mapping the retrieved user data is crucial for simplifying client-side logic.
+ * - Sends a JSON (array of objects) response to the client containing the formatted user data.
  *
+ * Benefits of using Sequelize transactions:
+ * - Ensures database consistency by grouping multiple database operations into a single transaction.
+ * Benefits of using `transaction t`:
+ * - Helps manage the state of the transaction and allows committing or rolling back as needed.
+ * Benefits of using `t.commit()`:
+ * - Finalizes the transaction if all operations within it are successful.
+ * Benefits of using `t.rollback()`:
+ * - Rolls back the transaction, undoing any changes made within the transaction.
  */
-exports.getAllUsers = (req, res, next) => {
+
+// Define the getAllUsers controller function
+exports.getAllUsers = async (req, res, next) => {
   try {
-    // Use Sequelize to query the database for all users
-    User.findAll({
-      // Select specific attributes (name, totalExpenses) from the User model
+    // Start a Sequelize transaction to ensure database consistency
+    const t = await sequelize.transaction();
+
+    // Use Sequelize to query the database for user data
+    const users = await User.findAll({
       attributes: [
         [sequelize.col("name"), "name"],
         [sequelize.col("totalExpenses"), "totalExpenses"],
       ],
-      // Order the results based on total expenses in descending order
       order: [[sequelize.col("totalExpenses"), "DESC"]],
-    }).then((users) => {
-      // Format the user data for response
-      const result = users.map((user) => ({
-        name: user.getDataValue("name"),
-        totalExpenses: user.getDataValue("totalExpenses"),
-      }));
-
-      // Send a JSON response containing the formatted user data
-      res.send(result);
+      transaction: t, // Pass the transaction to the query
     });
+
+    // Map the retrieved user data into a more concise format
+    const result = users.map((user) => ({
+      name: user.getDataValue("name"),
+      totalExpenses: user.getDataValue("totalExpenses"),
+    }));
+
+    // Commit the transaction if all operations are successful
+    await t.commit();
+
+    // Send a JSON response containing the formatted user data
+    res.status(200).json(result);
   } catch (error) {
-    // Log any errors that occur during the process
-    console.log("An error occurred while fetching user data:", error);
+    // Log and handle errors
+    console.error("Error in getAllUsers controller:", error);
+
+    // Rollback the transaction if there's an error
+    await t.rollback();
+
+    // Send an error JSON response with a 500 status code
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

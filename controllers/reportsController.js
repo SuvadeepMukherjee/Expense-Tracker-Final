@@ -92,7 +92,7 @@ exports.monthlyReports = async (req, res, next) => {
     const expenses = await Expense.findAll({
       where: {
         date: {
-          [Op.like]: `%-${month}-%`,
+          [Op.like]: `%-${month}-%`,//queries to perform complex conditions
         },
         userId: req.user.id,
       },

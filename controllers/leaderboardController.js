@@ -5,7 +5,6 @@ const rootDir = require("../util/path");
 const User = require("../models/userModel");
 //creates a connection to the database
 const sequelize = require("../util/database");
-const { log } = require("console");
 
 /**
  * getLeaderboardPage controller

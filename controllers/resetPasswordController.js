@@ -143,13 +143,15 @@ exports.updatePassword = async (req, res, next) => {
     //Extract the requestId from the referer header
     const requestId = req.headers.referer.split("/");
 
+    const uniqueId = requestId[requestId.length - 1];
+
     //Extract the new password from the request body
     const password = req.body.password;
 
     //Check for an active reset request with the given requestId
     const checkResetRequest = await ResetPassword.findAll({
       //querry the database for the id(uuid) and isActive:true
-      where: { id: requestId[requestId.length - 1], isActive: true },
+      where: { id: uniqueId, isActive: true },
     });
 
     //if an active reset request is found

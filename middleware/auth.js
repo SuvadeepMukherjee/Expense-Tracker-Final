@@ -2,21 +2,17 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 /**
- * Middleware to authenticate and authorize users based on a JWT.
- * During login we are genarating a token which has a payload of the following
- * structure
- * {
- *   "userId": 9,
- *   "email": "helal@zohomail.in",
- *   "iat": 1702366097
- * }
- * during endpoints like /purchase/premiumMembership we are sending the token as headers
- * like axios.get("http://localhost:3000/purchase/premiumMembership",
-    { headers: { Authorization: token } })
-    we extract the token and decode the user using jwt.verify
- * If the token is valid, it retrieves the corresponding user from the database and attaches it to the request 
-    (req.user).
- * If any error occurs, it logs the error and sends a 401 Unauthorized response with { success: false }.
+ During login we are genarating a token which has a payload of the following structure
+{
+  "userId": 9,
+  "email": "helal@zohomail.in",
+  "iat": 1702366097
+}
+during endpoints like /purchase/premiumMembership we are sending the token as headers
+like axios.get("endPoint",{ headers: { Authorization: token } })
+we extract the token and decode the user using jwt.verify
+If the token is valid,  retrieves the corresponding user from the db and attaches it to the request (req.user).
+If any error occurs, it logs the error and sends a 401 Unauthorized response with { success: false }.
  */
 const authenticateMiddleware = async (req, res, next) => {
   try {
@@ -35,7 +31,6 @@ const authenticateMiddleware = async (req, res, next) => {
     // Move to the next middleware
     next();
   } catch (error) {
-    // Log the error
     console.error("Error in authentication middleware:", error);
 
     // Send a 401 Unauthorized response with { success: false }

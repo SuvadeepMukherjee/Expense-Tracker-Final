@@ -20,19 +20,15 @@ async function createUser(event) {
     emailValue,
     passwordValue,
   };
-
-  //make a post request to create a new user
-  await axios
+  console.log(obj);
+  axios
     .post("http://localhost:3000/user/signup", obj)
     .then((response) => {
-      //Check if the request was succesfull(status code 200)
       if (response.status === 200) {
-        //Redirect to the login page
         window.location.href = "/user/login";
       }
     })
     .catch((err) => {
-      //Check if the error is due to a confliuct(status code 409)
       if (err.response.status === 409) {
         //display a user-friendly error message
         backendResponse.innerHTML = "Email Already Exists";

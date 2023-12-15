@@ -31,10 +31,11 @@ app.use(cors());
 app.use(express.static("public"));
 
 // Parse incoming URL-encoded data and make it available in req.body
-// Parse incoming JSON data and make it available in req.body
 // When extended is set to false, body-parser parses URL-encoded data using the classic syntax,
 // resulting in req.body containing string or array values, not allowing parsing of complex objects.
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Parse incoming JSON data and make it available in req.body
 app.use(bodyParser.json());
 
 //importing routers
@@ -60,8 +61,7 @@ app.use("/reports", reportsRouter);
 // For example, User.hasMany(Expense) creates a foreign key 'UserId' in the Expense model,
 // linking each expense to a specific user
 // Both associations are needed for a bidirectional relationship,
-// allowing navigation from User to Expense and vice versa.
-// Establishing bidirectional relationships for data integrity and query convenience
+// Establishing bidirectional relationships are necessary for data integrity
 User.hasMany(Expense);
 Expense.belongsTo(User);
 User.hasMany(Order);

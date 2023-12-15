@@ -5,6 +5,7 @@ const { Op } = require("sequelize");
 const AWS = require("aws-sdk");
 const rootDir = require("../util/path");
 const UrlModel = require("../models/urlModel");
+const sequelize = require("../util/database");
 
 /*
   Controller Function: getReportsPage
@@ -22,27 +23,41 @@ exports.getReportsPage = (req, res, next) => {
 /*
   Controller Function: dailyReports
   Handles a POST request to the reports/dailyReports Endpoint 
-
-  Description:
-  This asynchronous function handles POST requests for daily expense reports.
-  - We are sending the date from the frontend 
+  - We are sending the date from the frontend reports page 
+  - Before reaching this controller the request gets send to the auth.js middleware
   - Retrieves the selected date from the request body.
   - Uses Sequelize's 'Expense' model to query the database for expenses on the specified date.
   - Filters expenses based on both date and user ID.
-  - we are sending the raw data back to the client(javascript object)
+  - we are sending json  back(array of objects) to the client
   - In the client we extract the data 
+  Benefits of using Sequelize transactions:
+  - Ensures database consistency by grouping multiple database operations into a single transaction.
+  Benefits of using `transaction t`:
+  - Helps manage the state of the transaction and allows committing or rolling back as needed.
+  Benefits of using `t.commit()`:
+  - Finalizes the transaction if all operations within it are successful.
+  Benefits of using `t.rollback()`:
+  - Rolls back the transaction, undoing any changes made within the transaction.
 */
 exports.dailyReports = async (req, res, next) => {
+  const t = await sequelize.transaction();
   try {
     const date = req.body.date;
+    // Start a Sequelize transaction to ensure database consistency
+
     //Query the database for the expenses on the specified data and for the authenticated user
     const expenses = await Expense.findAll({
       where: { date: date, userId: req.user.id },
+      transaction: t, // Pass the transaction to the query
     });
-
-    return res.send(expenses);
+    // Commit the transaction if all operations are successful
+    t.commit();
+    return res.status(200).json(expenses);
   } catch (error) {
     console.log(error);
+    // Rollback the transaction if there's an error
+    t.rollback();
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -56,11 +71,21 @@ exports.dailyReports = async (req, res, next) => {
   - Uses Sequelize's 'Expense' model to query the database for expenses within the specified month.
   - Filters expenses based on both date (using Sequelize's [Op.like] operator) and user ID.
   - Sends the fetched expenses as the HTTP response.(raw data , javascript object)
+  Benefits of using Sequelize transactions:
+  - Ensures database consistency by grouping multiple database operations into a single transaction.
+  Benefits of using `transaction t`:
+  - Helps manage the state of the transaction and allows committing or rolling back as needed.
+  Benefits of using `t.commit()`:
+  - Finalizes the transaction if all operations within it are successful.
+  Benefits of using `t.rollback()`:
+  - Rolls back the transaction, undoing any changes made within the transaction.
 
   Notes:
   - Utilizes Sequelize's [Op.like] operator to filter expenses by the specified month.
 */
 exports.monthlyReports = async (req, res, next) => {
+  // Start a Sequelize transaction to ensure database consistency
+  const t = await sequelize.transaction();
   try {
     const month = req.body.month;
     // Query the database for expenses within the specified month and for the authenticated user
@@ -71,10 +96,17 @@ exports.monthlyReports = async (req, res, next) => {
         },
         userId: req.user.id,
       },
+      transaction: t, // Pass the transaction to the query
     });
-    return res.send(expenses);
+    // Commit the transaction if all operations are successful
+    t.commit();
+    return res.status(200).json(expenses);
   } catch (error) {
+    // Rollback the transaction if there's an error
+    t.rollback();
     console.log(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+    // Rollback the transaction if there's an error
   }
 };
 
@@ -133,28 +165,42 @@ function uploadTos3(data, filename) {
  * - Responds with a JSON object containing the file URL and success message.
  */
 exports.downloadExpense = async (req, res, next) => {
-  const userid = req.user.dataValues.id;
+  const t = await sequelize.transaction();
+  try {
+    const userid = req.user.dataValues.id;
 
-  // Query the database for the user's expenses
-  const expenses = await Expense.findAll({
-    where: { userId: userid },
-  });
+    // Query the database for the user's expenses
+    const expenses = await Expense.findAll({
+      where: { userId: userid },
+      transaction: t, // Pass the transaction to the query
+    });
 
-  // Stringify expenses array for upload
-  const stringifiedExpenses = JSON.stringify(expenses);
+    // Stringify expenses array for upload
+    const stringifiedExpenses = JSON.stringify(expenses);
 
-  // Generate a file name based on user ID and current date
-  const fileName = `Expenses${userid}/${new Date()}.txt`;
+    // Generate a file name based on user ID and current date
+    const fileName = `Expenses${userid}/${new Date()}.txt`;
 
-  // Upload stringified expenses to an S3 bucket and retrieve the file URL
-  const fileURL = await uploadTos3(stringifiedExpenses, fileName);
+    // Upload stringified expenses to an S3 bucket and retrieve the file URL
+    const fileURL = await uploadTos3(stringifiedExpenses, fileName);
 
-  // Create a new record in the UrlModel with the download URL and user ID
-  await UrlModel.create({
-    downloadUrl: fileURL,
-    userId: userid,
-  });
+    // Create a new record in the UrlModel with the download URL and user ID
+    await UrlModel.create({
+      downloadUrl: fileURL,
+      userId: userid,
+      transaction: t,
+    });
+    // Commit the transaction if all operations are successful
+    await t.commit();
 
-  // Respond with a JSON object containing the file URL and success message
-  res.status(201).json({ fileURL, success: true, messageL: "File Downloaded" });
+    // Respond with a JSON object containing the file URL and success message
+    res
+      .status(200)
+      .json({ fileURL, success: true, message: "File Downloaded" });
+  } catch (error) {
+    // Rollback the transaction if there's an error
+    await t.rollback();
+    console.log(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 };

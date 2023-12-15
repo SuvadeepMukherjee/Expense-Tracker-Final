@@ -187,7 +187,7 @@ async function getMonthlyReport(e) {
   Description:
   Logs out the user by clearing the local storage and redirecting to the login page.
 */
-async function logout() {
+function logout() {
   try {
     localStorage.clear();
     window.location.href = "/user/login";
@@ -204,34 +204,28 @@ async function logout() {
  *   from the response and triggers a download for the file named "myexpense.csv".
  * - In case of any errors, the function logs the error to the console.
  */
-const download = () => {
+async function download() {
   const token = localStorage.getItem("token");
-
-  // Making a GET request to a server endpoint for file download
-  axios
-    .get("http://localhost:3000/reports/download", {
+  try {
+    const response = await axios.get("http://localhost:3000/reports/download", {
       headers: { Authorization: token },
-    })
-    .then((response) => {
-      if (response.status === 201) {
-        const fileURL = response.data.fileURL;
-
-        // Triggering download for the file named "myexpense.csv"
-        const a = document.createElement("a");
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.href = fileURL;
-        a.download = "myexpense.csv";
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        throw new Error(response.data.message);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
     });
-};
+    if (response.status === 200) {
+      const fileURL = response.data.fileURL;
+
+      // Triggering download for the file named "myexpense.csv"
+      const a = document.createElement("a");
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.href = fileURL;
+      a.download = "myexpense.csv";
+      a.click();
+      document.body.removeChild(a);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 //event listeners
 dateShowBtn.addEventListener("click", getDailyReport);

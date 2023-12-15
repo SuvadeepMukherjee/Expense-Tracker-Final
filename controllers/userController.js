@@ -4,28 +4,37 @@ const jwt = require("jsonwebtoken");
 
 const rootDir = require("../util/path");
 const User = require("../models/userModel");
+const sequelize = require("../util/database");
 
 /*
   This function generates an access token using the provided user ID and email.
   - Utilizes the 'jsonwebtoken' library to sign a token containing the user's ID and email.
   - Returns the generated access token.
+  -The `jwt.sign()` function takes two main parameters:
+     - Payload:  object with the data you want to encode in the token
+     - Secret: A secret key used to sign the token. 
+  -The resulting JWT is a string
   - we send this as a token during succesfull login (login function backend)
 */
 function generateAccessToken(id, email) {
+  //first paramater payload(as an object), second paramater secret key
   return jwt.sign({ userId: id, email: email }, process.env.JWT_SECRET);
 }
 
 /**
- * - Checks if the authenticated user is a premium member.
+ * - Handles GET request on user/isPremium Endpoint
+ * - sent from homePage.js
+ * - Before reaching this middleware the middleware goes through the auth.js (authenticated user)
  * - Responds to the client with a JSON object indicating the premium membership status.
  */
 exports.isPremiumUser = async (req, res, next) => {
   try {
     if (req.user.isPremiumUser) {
-      return res.json({ isPremiumUser: true });
+      return res.status(200).json({ isPremiumUser: true });
     }
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -59,8 +68,18 @@ exports.getLoginPage = (req, res, next) => {
   - Responds with a status:
     - 200 for successful sign-up, indicating a successful login.
     - 409 for conflicts, such as an email that is already taken.
+    Benefits of using Sequelize transactions:
+ 
+ Benefits of using `transaction t`:
+- Ensures database consistency by grouping multiple database operations into a single transaction.
+ Benefits of using `t.commit()`:
+ - Finalizes the transaction if all operations within it are successful.
+ Benefits of using `t.rollback()`:
+  - Rolls back the transaction, undoing any changes made within the transaction.  
 */
 exports.postUserSignUp = async (req, res, next) => {
+  // Start a Sequelize transaction to ensure database consistency
+  const t = await sequelize.transaction();
   try {
     //extract data from the request body
     const name = req.body.nameValue;
@@ -83,16 +102,21 @@ exports.postUserSignUp = async (req, res, next) => {
         name: name,
         email: email,
         password: hash,
+        transaction: t, // Pass the transaction to the query
       });
     });
-
+    // Commit the transaction if all operations are successful
+    await t.commit();
     //Send a success response
     res.status(200).json({
       success: true,
-      message: "Login Successful!",
+      message: "Signup Successful!",
     });
   } catch (err) {
     console.error(err);
+
+    // Rollback the transaction if there's an error
+    await t.rollback();
 
     //send an error response
     res.status(500).json({

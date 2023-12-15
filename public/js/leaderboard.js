@@ -1,3 +1,4 @@
+//selecting dom elements
 const categoryItems = document.querySelectorAll(".dropdown-item");
 const categoryInput = document.querySelector("#categoryInput");
 const categoryBtn = document.querySelector("#categoryBtn");
@@ -71,5 +72,6 @@ async function logout() {
   }
 }
 
+//event listeners
 document.addEventListener("DOMContentLoaded", getLeaderboard);
 logoutBtn.addEventListener("click", logout);

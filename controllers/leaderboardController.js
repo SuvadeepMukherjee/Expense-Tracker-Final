@@ -42,10 +42,9 @@ exports.getLeaderboardPage = (req, res, next) => {
 
 // Define the getAllUsers controller function
 exports.getAllUsers = async (req, res, next) => {
+  // Start a Sequelize transaction to ensure database consistency
+  const t = await sequelize.transaction();
   try {
-    // Start a Sequelize transaction to ensure database consistency
-    const t = await sequelize.transaction();
-
     // Use Sequelize to query the database for user data
     const users = await User.findAll({
       attributes: [

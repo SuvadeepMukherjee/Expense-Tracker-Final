@@ -4,8 +4,7 @@ const purchaseMembershipController = require("../controllers/purchaseMembershipC
 
 const authenticatemiddleware = require("../middleware/auth");
 
-//creates a modular, mountable set of routes for an Express.js application.
-// It allows you to organize routes and their handlers in a separate file
+//Creates a new router object in express , allows us to group related routes together
 const router = express.Router();
 
 router.get(

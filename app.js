@@ -5,8 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 /*
-loads and configures environment variables from a .env file
- into the Node.js application using the 'dotenv' package.
+loads  environment variables from a .env file
  */
 dotenv.config();
 
@@ -18,7 +17,7 @@ const Expense = require("./models/expenseModel");
 const Order = require("./models/ordersModel");
 const UrlDownloads = require("./models/urlModel");
 
-//creating an express application
+//initializes an express application
 const app = express();
 
 /*
@@ -27,7 +26,7 @@ const app = express();
  */
 app.use(cors());
 
-// Serve static files from the "public" directory
+// Serve static files (e.g., CSS, JS) from the "public" folder
 app.use(express.static("public"));
 
 // Parse incoming URL-encoded data and make it available in req.body

@@ -1,0 +1,9 @@
+- Added authentication for the user using JWT token.
+- Used Bcrypt library for encryption to store passwords in the database.
+- Integrated Razorpay payment gateway.
+- Integrated Brevo for Reset Password link.
+- Added pagination for the expenses page.
+- Added report generation using AWS S3 bucket for premium users.
+- Integrated download option for premium users.
+- Premium users can find their previous downloads with date and time.
+- Added a leaderboard list for premium users.
